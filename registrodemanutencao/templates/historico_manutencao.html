@@ -71,22 +71,20 @@
     }
 </style>
 
-
-    <div class="container mt-4">
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <form method="get" action="{% url 'historico_manutencaoListView' %}">
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" name="nome" placeholder="Nome" value="{{ request.GET.nome }}">
-                        <input type="text" class="form-control" name="id_equipamento" placeholder="ID Equipamento" value="{{ request.GET.id_equipamento }}">
-                        <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" type="submit">Buscar</button>
-                        </div>
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <form method="get" action="{% url 'historico_manutencaoListView' %}">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" name="nome" placeholder="Nome" value="{{ request.GET.nome }}">
+                    <input type="text" class="form-control" name="retornoequipamentos" placeholder="ID Equipamento" value="{{ request.GET.retornoequipamentos }}">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="submit">Buscar</button>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
-    
+    </div>
 
     <div class="table-responsive">
         <table class="table table-bordered table-striped">
@@ -100,9 +98,8 @@
                     <th>Customização</th>
                     <th>Recebimento</th>
                     <th>Entregue / Retirado</th>
-                    <th>ID Equipamentos</th>
                     <th>Manutenção Equipamento</th>
-                    <th>Retorno Equipamento</th>
+                    <th>ID Equipamento</th>
                     <th>Faturamento</th>
                     <th>Setor</th>
                     <th>Status</th>
@@ -123,7 +120,6 @@
                     <td>{{ manutencao.tipo_customizacao }}</td>
                     <td>{{ manutencao.recebimento }}</td>
                     <td>{{ manutencao.entregue_por_retirado_por }}</td>
-                    <td>{{ manutencao.id_equipamentos }}</td>
                     <td>{{ manutencao.manutencaoequipamentos }}</td>
                     <td>{{ manutencao.retornoequipamentos }}</td>
                     <td>{{ manutencao.faturamento }}</td>
@@ -132,7 +128,7 @@
                     <td>{{ manutencao.customizacao_setor }}</td>
                     <td>{{ manutencao.numero_equipamento }}</td>
                     <td>{{ manutencao.tratativa }}</td>
-                    <td> <a class="btn btn-info" href="{% url 'download_pdf' manutencao.id %}">Download PDF</a></td>
+                    <td><a class="btn btn-info" href="{% url 'download_pdf' manutencao.id %}">Download PDF</a></td>
                 </tr>
                 {% endfor %}
             </tbody>

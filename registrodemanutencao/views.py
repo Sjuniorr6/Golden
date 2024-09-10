@@ -71,6 +71,8 @@ class FormulariosCreateView( PermissionRequiredMixin,LoginRequiredMixin , Create
 
 #----------------------------------------------------------------------------------
 
+
+
 # View para atualizar um registro de manutenção existente.
 class FormulariosUpdateView(LoginRequiredMixin,  UpdateView):
     model = registrodemanutencao
@@ -108,6 +110,8 @@ class FormulariosUpdateView(LoginRequiredMixin,  UpdateView):
         else:
             context['imagens_formset'] = ImagemRegistroFormSet(instance=self.object)
         return context
+    
+    
 
 class FormularioDetailView(LoginRequiredMixin,  DetailView):
     model = registrodemanutencao
@@ -489,13 +493,13 @@ class historico_manutencaoListView( PermissionRequiredMixin,LoginRequiredMixin ,
     def get_queryset(self):
         queryset = registrodemanutencao.objects.filter(status__in=['Aprovado Inteligência', 'Reprovado Inteligência','Reprovado pela Diretoria','Aprovado pela Diretoria','Enviado para o Cliente'])
         nome = self.request.GET.get('nome')
-        id_equipamento = self.request.GET.get('id_equipamento')
+        retornoequipamentos = self.request.GET.get('retornoequipamentos')
         
         if nome:
             queryset = queryset.filter(nome__nome__icontains=nome)
         
-        if id_equipamento:
-            queryset = queryset.filter(id_equipamentos__icontains=id_equipamento)
+        if retornoequipamentos:
+            queryset = queryset.filter(retornoequipamentos__icontains=retornoequipamentos)
         
         return queryset
 

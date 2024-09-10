@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.db.models import Q
 from django.conf import settings
+from registrodemanutencao.forms import FormulariosUpdateForm
 from django.core.mail import send_mail
 from django.contrib.auth.mixins import PermissionRequiredMixin,LoginRequiredMixin
 #------------------------------------------------------
@@ -82,14 +83,21 @@ class ConfiguracaoListView(PermissionRequiredMixin,LoginRequiredMixin,ListView):
         return combined_queryset
 
 
-
-class ConfiguracaoUpdateView(PermissionRequiredMixin,LoginRequiredMixin,UpdateView):
+class ConfiguracaoUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
     model = Requisicoes
     form_class = forms.requisicaoForm
     template_name = 'configuracao_update.html'
     context_object_name = 'equipamento'
     success_url = reverse_lazy('ConfiguracaoListView')
-    permission_required="requisicao.change_requisicoes"
+    permission_required = "requisicao.change_requisicoes"
+
+class ConfiguracaoUpdateView2(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+    model = registrodemanutencao
+    form_class = FormulariosUpdateForm
+    template_name = 'configuracao_update.html'
+    context_object_name = 'equipamento'
+    success_url = reverse_lazy('ConfiguracaoListView')
+    permission_required = "requisicao.change_requisicoes"
   
 
  #------------------------------------------------------   
@@ -200,7 +208,7 @@ def reprovar_ceo(request, id):
     registro = get_object_or_404(Requisicoes, id=id)
     registro.status = 'Reprovado pelo CEO'
     registro.save()
-    redirect('ceoListViews')
+    
     return redirect('ceoListViews')
 
 

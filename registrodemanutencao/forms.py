@@ -56,6 +56,7 @@ class FormulariosUpdateForm(forms.ModelForm):
             'faturamento': forms.Select(attrs={'class': 'form-control'}),
             'manutencaoequipamentos': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'retornoequipamentos': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            
             'customizacao': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'numero_equipamento': forms.TextInput(attrs={'class': 'form-control'}),
             'tratativa': forms.Select(attrs={'class': 'form-control'}),

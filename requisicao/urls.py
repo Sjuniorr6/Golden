@@ -16,7 +16,8 @@ urlpatterns = [
 #--------------------------------------------------------------------------------------------------------------------
     path('configlistview/', views.ConfiguracaoListView.as_view(), name='ConfiguracaoListView'),
     path('configuracao/<int:pk>/delete/', views.configuracaodeleteview.as_view(), name='ConfiguracaoListView'),
-    path('config/list/<int:pk>/Update/', views.ConfiguracaoUpdateView.as_view(), name='ConfiguracaoUpdateView'),  
+    path('config/list/<int:pk>/Update/', views.ConfiguracaoUpdateView.as_view(), name='ConfiguracaoUpdateView'),
+    path('config/list2/<int:pk>/Update/', views.ConfiguracaoUpdateView2.as_view(), name='ConfiguracaoUpdateView2'),
  #---------------------------------------------------------------------------------------------------------------
     path('ceo_list/list', views.ceoListViews.as_view(), name='ceoListViews'),  
     path('ceo_list/<int:pk>/detail/', views.ceodetailview.as_view(), name='ceodetailview'),

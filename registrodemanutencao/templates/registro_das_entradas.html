@@ -87,7 +87,7 @@
                     <a class="btn btn-primary" href="{% url 'FormularioDetailView' registro.id %}">Visualizar</a>
                     <a class="btn btn-success" href="{% url 'Aprovado_Inteligência' registro.id %}">Aprovar</a>
                     <a class="btn btn-danger" href="{% url 'Reprovado_Inteligência' registro.id %}">Diretoria</a>
-                    <a class="btn btn-info" href="{% url 'download_pdf' registro.id %}">Download PDF</a>
+                    <a class="btn btn-info" href="{% url 'download_pdfmanutencao' registro.id %}">Download PDF</a>
             
                     {% if registro.has_retorno_images %}
                     <a class="btn btn-warning" href="{% url 'download_laudo_saida' registro.id %}">Laudo de Saída</a>
