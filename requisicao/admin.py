@@ -25,7 +25,7 @@ class requisicoesadmin(admin.ModelAdmin):
     'observacoes',
     'TP',
     'status_faturamento',
-    'id_equipamentos'
+    'id_equipamentos','numero_de_equipamentos'
 )
     search_fields = ('nome',)
 

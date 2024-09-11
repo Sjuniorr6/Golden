@@ -11,3 +11,5 @@ class HomeView(LoginRequiredMixin,PermissionRequiredMixin, TemplateView):
     permission_required = "home.view_Home"
 
 
+
+

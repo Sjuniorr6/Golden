@@ -3,7 +3,9 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+
 urlpatterns = [
+    
     path('admin/', admin.site.urls),
     path('home/', include('home.urls')),          
     path('produto/', include('produto.urls')),    
@@ -27,6 +29,8 @@ urlpatterns = [
     path('prestadores/', include('prestadores.urls')),  
     path('regcliente/', include('regcliente.urls')),  
     path('qualit/', include('qualit.urls')),  
+    path('dashboard/', include('dashboard.urls')),  
+    path('adm/', include('adm.urls')),  
    
      
      

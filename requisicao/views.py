@@ -168,6 +168,7 @@ class historicoListView(PermissionRequiredMixin,LoginRequiredMixin,ListView):
     model = Requisicoes
     template_name = "historico_list.html"
     context_object_name = 'historico_list'
+    paginate_by = 10 
     permission_required="requisicao.view_requisicoes"
     
     def get_queryset(self):

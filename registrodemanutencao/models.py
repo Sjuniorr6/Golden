@@ -5,6 +5,8 @@ from django.db import models
 from acompanhamento.models import Clientes   
 from produto.models import Produto    
 
+from django.utils import timezone
+
 class registrodemanutencao(models.Model):
     TRATATIVAS = [
         ('Oxidação', 'Oxidação'),
@@ -14,8 +16,6 @@ class registrodemanutencao(models.Model):
         ('Antena LoRa Danificada', 'Antena LoRa Danificada'),
         ('USB Sem problemas Identificados', 'USB Sem problemas Identificados'),
     ]
-
-   
 
     TIPO_ENVIO = [
         ('Agente', 'Agente'),
@@ -56,7 +56,6 @@ class registrodemanutencao(models.Model):
         ('Manutenção', 'Manutenção'),
         ('configuração', 'configuração'),
     ]
-   
 
     CUSTOMIZACOES = [
         ('', ''),
@@ -69,7 +68,39 @@ class registrodemanutencao(models.Model):
     RECEBIMENTO_TIPO = [
         ('Correios/Transportadora', 'Correios/Transportadora'),
         ('Entrega na base', 'Entrega na base'),
-        ('Retirado pelo cliente', 'Retirado pelo cliente'),
+        
+    ]
+    custom= [
+
+        ('Sem custumização' , 'Sem custumização'),
+        ('Caixa de papelão' , 'Caixa de papelão' ),
+        ('Caixa de papelão (bateria desacoplada)' , 'Caixa de papelão (bateria desacoplada)'),
+        ('Caixa de papelão + DF' , 'Caixa de papelão + DF'),
+        ('Termo branco' , 'Termo branco'),
+        ('Termo branco + D.F ' , 'Termo branco + D.F'),
+        ('Termo branco slim ' , 'Termo branco slim'),
+        ('Termo branco slim + D.F +EQT  ' , 'Termo branco slim + D.F +EQT'),
+        ('Termo cinza slim + D.F +EQT  ' , 'Termo cinza slim + D.F +EQT'),
+        ('Termo branco  (isopor) ' , 'Termo branco  (isopor)'),
+        ('Termo branco - bateria externa ' , 'Termo branco - bateria externa'),
+        ('Termo marrom + imã' , 'Termo marrom + imã'),
+        ('Termo cinza' , 'Termo cinza'),
+        ('Termo cinza + imã' , 'Termo cinza + imã'),
+        ('Termo preto' , 'Termo preto'),
+        ('Termo preto + imã' , 'Termo preto + imã'),
+        ('Termo brabco |marrim-slim' , 'Termo brabco |marrim-slim'),
+        ('Termo marrom slim +D.F + EQT' , 'Termo marrom slim +D.F + EQT'),
+        ('Termo marrom' , 'Termo marrom'),
+        ('Caixa blindada' , 'Caixa blindada'),
+        ('Tênis/ Sapato' , 'Tênis/ Sapato'),
+        ('Projetor' , 'Projetor'),
+        ('Caixa de som' , 'Caixa de som'),
+        ('Luminaria' , 'Luminaria'),
+        ('Alexa' , 'Alexa'),
+        ('Video Game' , 'Video Game'),
+        ('Secador de cabelo' , 'Secador de cabelo'),
+        ('Roteador' , 'Roteador'),
+        ('Relogio digital' , 'Relogio digital'),
     ]
 
     nome = models.ForeignKey(Clientes, on_delete=models.CASCADE, related_name='formulario_nome')
@@ -78,19 +109,17 @@ class registrodemanutencao(models.Model):
     motivo = models.CharField(choices=MOTIVOS, null=True, blank=True, max_length=50)
     tipo_customizacao = models.CharField(choices=CUSTOMIZACOES, null=True, blank=True, max_length=50)
     recebimento = models.CharField(choices=RECEBIMENTO_TIPO, null=True, blank=True, max_length=50)
-    entregue_por_retirado_por = models.CharField(max_length=100, default="")
+    entregue_por_retirado_por = models.CharField(choices=RECEBIMENTO_TIPO,max_length=50, default="")
     id_equipamentos = models.CharField(max_length=100, blank=True, default='')
-    manutencaoequipamentos= models.TextField(max_length=250, blank=True, default='')
-    retornoequipamentos= models.TextField(max_length=250, blank=True, default='')
-    faturamento = models.CharField(choices=FATURAMENTO, null=True, blank=True, max_length=50)
     
+    faturamento = models.CharField(choices=FATURAMENTO, null=True, blank=True, max_length=50)
     setor = models.CharField(choices=SETOR, null=True, blank=True, max_length=50)
-    customizacao = models.TextField(max_length=250, blank=True, default='')
+    customizacaoo = models.CharField(choices=custom,max_length=250, blank=True, default='')
     numero_equipamento = models.TextField(max_length=250, blank=True, default='')
     tratativa = models.CharField(choices=TRATATIVAS, null=True, blank=True, max_length=50)
     imagem = models.ImageField(upload_to='imagens/', null=True, blank=True)
-    status = models.CharField( default='Pendente', max_length=50, null=True, blank=True)
-   
+    status = models.CharField(default='Pendente', max_length=50, null=True, blank=True)
+    data_criacao = models.DateTimeField(null=True, blank=True)  # Novo campo adicionado
    
 
 
@@ -99,9 +128,8 @@ class ImagemRegistro(models.Model):
 
     SETORID = [
         ('Retorno', 'Retorno'),
-        ('expedicao', 'expedicao'),
         ('Manutenção', 'Manutenção'),
-        ('configurção', 'configuração'),
+        
        
     ]
     TIPO_PROBLEMAS = [

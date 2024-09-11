@@ -223,39 +223,30 @@ def download_pdf(request, pk):
     p = canvas.Canvas(response, pagesize=letter)
     p.setTitle(f'Registro de Manutenção - {pk}')
 
-    # Defina as fontes e cores
+    # Cabeçalho
     p.setFont("Helvetica-Bold", 16)
     p.setFillColor(colors.HexColor("#004B87"))
-
-    # Cabeçalho
     y_position = 750
     p.drawString(100, y_position, "Relatório de Manutenção")
     y_position -= 30
 
-    # Adicionar as imagens lado a lado com fundo branco
+    # Adicionar imagens
     imagem_padrao = os.path.join(settings.MEDIA_ROOT, 'imagens_registros/SIDNEISIDNEISIDNEI.png')
     imagem_qrcode = os.path.join(settings.MEDIA_ROOT, 'imagens_registros/qrcode.png')
-    image_width = 200
-    image_height = 100
+    image_width, image_height = 200, 100
     page_width, page_height = letter
-    total_width = image_width * 2 + 20  # Largura total das duas imagens com um espaço entre elas
+    total_width = image_width * 2 + 20
     x_position = (page_width - total_width) / 2
 
-    # Desenhar um retângulo branco como fundo para as imagens
     p.setFillColor(colors.white)
     p.rect(x_position - 10, y_position - image_height - 10, total_width + 20, image_height + 20, fill=1)
-
-    # Desenhar a primeira imagem
     p.drawImage(imagem_padrao, x_position, y_position - image_height, width=image_width, height=image_height)
-    # Desenhar a segunda imagem ao lado da primeira
     p.drawImage(imagem_qrcode, x_position + image_width + 20, y_position - image_height, width=image_width, height=image_height)
     y_position -= (image_height + 20)
 
-    # Restaurar a fonte para o conteúdo principal
     p.setFont("Helvetica", 12)
     p.setFillColor(colors.black)
 
-    # Função para desenhar texto formatado
     def draw_text(p, text, x, y, max_width):
         lines = text.split('\n')
         for line in lines:
@@ -276,7 +267,6 @@ def download_pdf(request, pk):
                 y -= 20
         return y
 
-    # Função para verificar se há espaço suficiente na página atual
     def check_space(p, y_position, required_space):
         if y_position - required_space < 50:
             p.showPage()
@@ -285,7 +275,6 @@ def download_pdf(request, pk):
             return 750
         return y_position
 
-    # Desenhe o conteúdo do PDF
     y_position = draw_text(p, f"Nome: {registro.nome}", 100, y_position, 400)
     y_position = draw_text(p, f"Tipo de Entrada: {registro.tipo_entrada}", 100, y_position, 400)
     y_position = draw_text(p, f"Tipo de Produto: {registro.tipo_produto}", 100, y_position, 400)
@@ -293,11 +282,10 @@ def download_pdf(request, pk):
     y_position = draw_text(p, f"Tipo Customização: {registro.tipo_customizacao}", 100, y_position, 400)
     y_position = draw_text(p, f"Entregue por/Retirado por: {registro.entregue_por_retirado_por}", 100, y_position, 400)
     y_position = draw_text(p, f"Recebimento: {registro.recebimento}", 100, y_position, 400)
-    y_position = draw_text(p, f"Manutenção Equipamentos: {registro.manutencaoequipamentos}", 100, y_position, 400)
-    y_position = draw_text(p, f"Retorno Equipamentos: {registro.retornoequipamentos}", 100, y_position, 400)
+   
     y_position = draw_text(p, f"Faturamento: {registro.faturamento}", 100, y_position, 400)
     y_position = draw_text(p, f"Setor: {registro.setor}", 100, y_position, 400)
-    y_position = draw_text(p, f"Customização: {registro.customizacao}", 100, y_position, 400)
+    y_position = draw_text(p, f"Customização: {registro.customizacaoo}", 100, y_position, 400)
     y_position = draw_text(p, f"Número Equipamento: {registro.numero_equipamento}", 100, y_position, 400)
     y_position = draw_text(p, f"Tratativa: {registro.tratativa}", 100, y_position, 400)
     y_position = draw_text(p, f"Status: {registro.status}", 100, y_position, 400)
@@ -488,6 +476,7 @@ class historico_manutencaoListView( PermissionRequiredMixin,LoginRequiredMixin ,
     model = registrodemanutencao
     template_name = 'historico_manutencao.html'  # Nome do seu template para status "configuração"
     context_object_name = 'dasentradas'
+    paginate_by = 10 
     permission_required = 'registrodemanutencao.view_registrodemanutencao'  # Substitua 'registrodemanutencao' pelo nome do seu aplicativo
     
     def get_queryset(self):
@@ -500,6 +489,7 @@ class historico_manutencaoListView( PermissionRequiredMixin,LoginRequiredMixin ,
         
         if retornoequipamentos:
             queryset = queryset.filter(retornoequipamentos__icontains=retornoequipamentos)
+        
         
         return queryset
 

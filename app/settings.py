@@ -23,7 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+    'adm',
     'cliente',
     'produto',
     'register',
@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'formacompanhamento',    
     'prestadores',    
     'regcliente',    
+    'dashboard',    
 ]
 
 MIDDLEWARE = [
@@ -60,6 +61,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'app.urls'
+
+ALLOWED_HOSTS = ['10.0.0.227', 'localhost', '127.0.0.1']
 
 TEMPLATES = [
     {

@@ -22,7 +22,7 @@
         </div>
 
     </div>
-
+              
    <div class="row mb-3">
     
     <div class="col-md-12">
@@ -30,7 +30,7 @@
             <i class="bi bi-box-arrow-in-up-right"></i> Criar cliente
         </a>
    </div>
-    
+
 </div>
 
 </div>
@@ -72,11 +72,13 @@
                 <td>{{ cliente.equipamento }}<!-- Use o nome do campo correto -->
                 <td>{{ cliente.quantidade }}<!-- Use o nome do campo correto -->
                 
-                <td><a href="{% url 'cliente_detail' cliente.id%}" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a><!-- Use o nome do campo correto -->
+                <td><a href="{% url 'cliente_detail' cliente.id%}" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>
+                    {% if perm.cliente.change_clientes %}<!-- Use o nome do campo correto -->
                 <a href="{% url 'cliente_update' cliente.id%}" class="btn btn-warning btn-sm"><i class="bi bi-pencil"></i></a>
                     <a href="{% url 'cliente_delete' cliente.id%}" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></a>
                 </td>    
                 </tr>
+                {% endif%}
 
                    
             {% endfor %}

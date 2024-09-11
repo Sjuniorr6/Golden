@@ -111,7 +111,7 @@
                         {% if registro.status == 'Aprovado pelo CEO' %}
                         <a href="{% url 'expedir_requisicao' registro.id %}" class="btn btn-primary">Expedição Requisição</a>
                         <a href="{% url 'ConfiguracaoUpdateView' registro.id %}" class="btn btn-secondary">Editar Requisição</a>
-                    {% elif registro.status == 'Aprovado Diretoria' %}
+                    {% elif registro.status == 'Aprovado pela Diretoria' %}
                         <a href="{% url 'expedir_manutencao' registro.id %}" class="btn btn-primary">Expedição Manutenção</a>
                         <a href="{% url 'ConfiguracaoUpdateView2' registro.id %}" class="btn btn-secondary">Editar Manutenção</a>
                     {% elif registro.status == 'Aprovado Inteligência' %}

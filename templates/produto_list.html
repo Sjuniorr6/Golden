@@ -22,14 +22,14 @@
         </div>
 
     </div>
-
+    {% if perms.produto.change_produto %}
    <div class="row mb-3">
     <div class="col-md-12">
         <a href="{% url 'produto_create' %}" class="btn btn-primary float-end">
             <i class="bi bi-box-arrow-in-up-right"></i> Criar Produto
         </a>
    </div>
-    
+   {% endif %}
 </div>
 
 </div>
@@ -59,11 +59,12 @@
                 <td>{{ produto.marca }}<!-- Use o nome do campo correto -->
                 <td>{{ produto.quantidade }}<!-- Use o nome do campo correto -->
                 
-                <td><a href="{% url 'produto_detail' produto.id%}" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a><!-- Use o nome do campo correto -->
-                <a href="{% url 'produto_update' produto.id%}" class="btn btn-warning btn-sm"><i class="bi bi-pencil"></i></a>
-                    <a href="{% url 'produto_delete' produto.id%}" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></a>
+                <td><a href="{% url 'produto_detail' produto.id%}" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>
+                    {% if perms.produto.change_produto %}<!-- Use o nome do campo correto -->
+                    <a href="{% url 'produto_update' produto.id %}" class="btn btn-warning btn-sm"><i class="bi bi-pencil"></i></a>
+                    <a href="{% url 'produto_delete' produto.id %}" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></a>
                 </td>    
-                </tr>
+                </tr>{% endif %}
 
                    
             {% endfor %}

@@ -48,6 +48,7 @@ class Requisicoes(models.Model):
         ('Reversa', 'Reversa'),
     ]
 
+
     # Definição das escolhas de tipo de envio
     tipo_envio = [
         ('Agente', 'Agente'),
@@ -83,15 +84,61 @@ class Requisicoes(models.Model):
         ('Aprovado pela Diretoria', 'Aprovado pela Diretoria'),
         ('Enviado para o Cliente', 'Enviado para o Cliente'),
     ]
+    customizacoes = [
+
+        ('Sem custumização' , 'Sem custumização'),
+        ('Caixa de papelão' , 'Caixa de papelão' ),
+        ('Caixa de papelão (bateria desacoplada)' , 'Caixa de papelão (bateria desacoplada)'),
+        ('Caixa de papelão + DF' , 'Caixa de papelão + DF'),
+        ('Termo branco' , 'Termo branco'),
+        ('Termo branco + D.F ' , 'Termo branco + D.F'),
+        ('Termo branco slim ' , 'Termo branco slim'),
+        ('Termo branco slim + D.F +EQT  ' , 'Termo branco slim + D.F +EQT'),
+        ('Termo cinza slim + D.F +EQT  ' , 'Termo cinza slim + D.F +EQT'),
+        ('Termo branco  (isopor) ' , 'Termo branco  (isopor)'),
+        ('Termo branco - bateria externa ' , 'Termo branco - bateria externa'),
+        ('Termo marrom + imã' , 'Termo marrom + imã'),
+        ('Termo cinza' , 'Termo cinza'),
+        ('Termo cinza + imã' , 'Termo cinza + imã'),
+        ('Termo preto' , 'Termo preto'),
+        ('Termo preto + imã' , 'Termo preto + imã'),
+        ('Termo brabco |marrim-slim' , 'Termo brabco |marrim-slim'),
+        ('Termo marrom slim +D.F + EQT' , 'Termo marrom slim +D.F + EQT'),
+        ('Termo marrom' , 'Termo marrom'),
+        ('Caixa blindada' , 'Caixa blindada'),
+        ('Tênis/ Sapato' , 'Tênis/ Sapato'),
+        ('Projetor' , 'Projetor'),
+        ('Caixa de som' , 'Caixa de som'),
+        ('Luminaria' , 'Luminaria'),
+        ('Alexa' , 'Alexa'),
+        ('Video Game' , 'Video Game'),
+        ('Secador de cabelo' , 'Secador de cabelo'),
+        ('Roteador' , 'Roteador'),
+        ('Relogio digital' , 'Relogio digital'),
+
+
+    ]
+    meses = [
+    ('6', '6'),
+    ('12', '12'),
+    ('18', '18'),
+    ('24', '24'),
+    ('30', '30'),
+    ('36', '36'),
+    ('48', '48'),
+]
 
     # Campos do modelo
     nome = models.ForeignKey(Clientes, on_delete=models.CASCADE, related_name='requisicoes_nome')
     endereco = models.CharField(max_length=255, blank=True, null=True)
     contrato = models.CharField(choices=contrato_tipo, null=True, blank=True, max_length=50)
     cnpj = models.CharField(max_length=14, blank=True, null=True)
+    numero_de_equipamentos = models.CharField(max_length=14, blank=True, null=True)
     inicio_de_contrato = models.DateField(blank=True, null=True)
-    vigencia = models.DateField(blank=True, null=True)
+    vigencia = models.CharField(max_length=50,choices=meses,blank=True, null=True)
+    customizacao = models.CharField(max_length=50,choices=meses,blank=True, null=True)
     data = models.DateField()
+    tipo_customizacao = models.CharField(choices=customizacoes ,null=True,blank=True, max_length=50)
     motivo = models.CharField(choices=motivoc,  default='', null=True, blank=True, max_length=50)
     envio = models.CharField(choices=tipo_envio, null=True, blank=True, max_length=50)
     taxa_envio = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)

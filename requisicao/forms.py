@@ -8,14 +8,15 @@ class requisicaoForm(forms.ModelForm):
         fields = ['nome', 'endereco', 'contrato', 'cnpj', 'inicio_de_contrato', 'vigencia', 'data',
                   'motivo', 'envio', 'comercial', 'tipo_produto', 
                   'carregador', 'cabo', 'tipo_fatura', 'valor_unitario', 'valor_total',
-                  'forma_pagamento', 'observacoes', 'status', 'TP', 'taxa_envio','status_faturamento', 'id_equipamentos']
+                  'forma_pagamento','tipo_customizacao', 'numero_de_equipamentos', 'observacoes', 'status', 'TP', 'taxa_envio','status_faturamento', 'id_equipamentos']
         widgets = {
             'nome': forms.Select(attrs={'class': 'form-control'}),
             'endereco': forms.Textarea(attrs={'class': 'form-control', 'rows': 1}),
+            'numero_de_equipamentos': forms.Textarea(attrs={'class': 'form-control', 'rows': 1}),
             'contrato': forms.Select(attrs={'class': 'form-control'}),
             'cnpj': forms.TextInput(attrs={'class': 'form-control'}),
             'inicio_de_contrato': forms.DateInput(attrs={'class': 'form-control'}),
-            'vigencia': forms.DateInput(attrs={'class': 'form-control'}),
+            'vigencia': forms.Select(attrs={'class': 'form-control'}),
             'data': forms.DateInput(attrs={'class': 'form-control'}),
             'motivo': forms.Select(attrs={'class': 'form-control'}),
             'comercial': forms.TextInput(attrs={'class': 'form-control'}),
@@ -24,6 +25,7 @@ class requisicaoForm(forms.ModelForm):
             'taxa_envio': forms.NumberInput(attrs={'class': 'form-control'}),
             'carregador': forms.TextInput(attrs={'class': 'form-control'}),
             'cabo': forms.TextInput(attrs={'class': 'form-control'}),
+            'tipo_customizacao': forms.Select(attrs={'class': 'form-control'}),
             'tipo_fatura': forms.Select(attrs={'class': 'form-control'}),
             'valor_unitario': forms.NumberInput(attrs={'class': 'form-control'}),
             'valor_total': forms.NumberInput(attrs={'class': 'form-control'}),
