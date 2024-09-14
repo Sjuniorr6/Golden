@@ -87,8 +87,10 @@
                             {% else %}
                                 
                             {% endif %}
+                            {% if perms.requisicao.add_requisicoes %}
                             {% if perms.registrodemanutencao.add_registrodemanutencao %}
                             <li><a class="dropdown-item" href="{% url 'FormulariosCreateView' %}">Entrada / Manutenção</a></li>
+                            {% endif %}
                             {% endif %}
                             {% if perms.requisicao.view_requisicoes %}
                             <li><a class="dropdown-item" href="{% url 'ConfiguracaoListView' %}">Configuração </a></li>
@@ -154,10 +156,10 @@
                             <li><a class="dropdown-item" href="{% url 'cliente_list' %}">Cliente</a></li>
 
                             <li><a class="dropdown-item" href="{% url 'requisicoes' %}">Requisiçao</a></li>
+                            
                             <li><a class="dropdown-item" href="{% url 'historicoListViews' %}">Historico Requisiçoes</a></li>
-                    
+                        </li>
                         </ul>
-                    </li>
                     {% endif %}
                     {% endif %}
                     {% endif %}
