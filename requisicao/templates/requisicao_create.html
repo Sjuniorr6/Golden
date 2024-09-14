@@ -1,22 +1,39 @@
-
 {% extends 'base.html' %}
 {% block content %}
 <div class="container mt-4">
-<h3 class="display-4"> Criar Requisição</h3>
+    <h3 class="display-4"> Criar Requisição</h3>
 
-<div class="card">
-    <div class="card-body">
-        <form method="post" class="form">
-            {% csrf_token %}
-
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary"> Salvar Requisiçao</button>
-        </form>
+    <div class="card">
+        <div class="card-body">
+            <form method="post" class="form">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary"> Salvar Requisição</button>
+            </form>
+        </div>
     </div>
-</div>
-<a href="#" class="btn btn-secondary mt3"> Cancelar e Voltar</a>
+    <a href="#" class="btn btn-secondary mt-3"> Cancelar e Voltar</a>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
+<script>
+    $(document).ready(function() {
+        $('#id_nome').change(function() {
+            var clienteId = $(this).val();
+            if (clienteId) {
+                $.ajax({
+                    url: '{% url "get_cliente_data" 0 %}'.replace('0', clienteId),
+                    type: 'GET',
+                    success: function(data) {
+                        $('#id_cnpj').val(data.cnpj);
+                        $('#id_inicio_de_contrato').val(data.inicio_de_contrato);
+                        $('#id_vigencia').val(data.vigencia);
+                        $('#id_contrato').val(data.contrato);
+                        $('#id_endereco').val(data.endereco);
+                    }
+                });
+            }
+        });
+    });
+</script>
 {% endblock %}

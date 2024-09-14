@@ -9,7 +9,7 @@ from django.views.generic import ListView
 from requisicao.models import Requisicoes
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
-class ReativacaoIdIccidCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
+class ReativacaoIdIccidCreateView(PermissionRequiredMixin,LoginRequiredMixin, View):
     permission_required = 'reativacao.add_reativacao'  # Substitua 'reativacao' pelo nome do seu aplicativo
 
     def get(self, request):

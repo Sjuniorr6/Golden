@@ -8,7 +8,9 @@
 
 <div class="row mb-3">
     <div class="coll-md-6">
+       
         <form method="get" action="{% url 'saidas_list' %}">
+        
         <div class="input-group">
             <input type="text" class="form-control" name="nome" placeholder="nome" value="{{ request.GET.name }}">
             <button type="submit" class="btn btn-primary"> 
@@ -22,14 +24,14 @@
         </div>
 
     </div>
-
+    {% if perms.saidas.change_saidas %}
    <div class="row mb-3">
     <div class="col-md-12">
         <a href="{% url 'saidas_create' %}" class="btn btn-primary float-end">
             <i class="bi bi-box-arrow-in-up-right"></i> Registrar saida
         </a>
    </div>
-    
+   {% endif %}
 </div>
 
 </div>

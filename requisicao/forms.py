@@ -5,7 +5,7 @@ from datetime import datetime
 class requisicaoForm(forms.ModelForm):
     class Meta:
         model = Requisicoes
-        fields = ['nome', 'endereco', 'contrato', 'cnpj', 'inicio_de_contrato', 'vigencia', 'data',
+        fields = ['nome', 'endereco', 'contrato', 'cnpj', 'inicio_de_contrato', 'vigencia', 
                   'motivo', 'envio', 'comercial', 'tipo_produto', 
                   'carregador', 'cabo', 'tipo_fatura', 'valor_unitario', 'valor_total',
                   'forma_pagamento','tipo_customizacao', 'numero_de_equipamentos', 'observacoes', 'status', 'TP', 'taxa_envio','status_faturamento', 'id_equipamentos']
@@ -17,7 +17,7 @@ class requisicaoForm(forms.ModelForm):
             'cnpj': forms.TextInput(attrs={'class': 'form-control'}),
             'inicio_de_contrato': forms.DateInput(attrs={'class': 'form-control'}),
             'vigencia': forms.Select(attrs={'class': 'form-control'}),
-            'data': forms.DateInput(attrs={'class': 'form-control'}),
+            
             'motivo': forms.Select(attrs={'class': 'form-control'}),
             'comercial': forms.TextInput(attrs={'class': 'form-control'}),
             'tipo_produto': forms.Select(attrs={'class': 'form-control'}),

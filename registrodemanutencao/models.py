@@ -110,7 +110,7 @@ class registrodemanutencao(models.Model):
     tipo_customizacao = models.CharField(choices=CUSTOMIZACOES, null=True, blank=True, max_length=50)
     recebimento = models.CharField(choices=RECEBIMENTO_TIPO, null=True, blank=True, max_length=50)
     entregue_por_retirado_por = models.CharField(choices=RECEBIMENTO_TIPO,max_length=50, default="")
-    id_equipamentos = models.CharField(max_length=100, blank=True, default='')
+    id_equipamentos = models.TextField(max_length=1200, blank=True, default='')
     
     faturamento = models.CharField(choices=FATURAMENTO, null=True, blank=True, max_length=50)
     setor = models.CharField(choices=SETOR, null=True, blank=True, max_length=50)
@@ -119,7 +119,7 @@ class registrodemanutencao(models.Model):
     tratativa = models.CharField(choices=TRATATIVAS, null=True, blank=True, max_length=50)
     imagem = models.ImageField(upload_to='imagens/', null=True, blank=True)
     status = models.CharField(default='Pendente', max_length=50, null=True, blank=True)
-    data_criacao = models.DateTimeField(null=True, blank=True)  # Novo campo adicionado
+    data_criacao = models.DateTimeField(auto_now_add=True, null=True, blank=True)
    
 
 
@@ -172,4 +172,4 @@ class retorno(models.Model):
     id_equipamentos = models.TextField(max_length=250, blank=True, default='')
 
     def __str__(self):
-        return f"{self.cliente} - {self.produto} - {self.tipo_problema}"
+        return f"{self.cliente} - {self.produto} - {self.tipo_problema}" 

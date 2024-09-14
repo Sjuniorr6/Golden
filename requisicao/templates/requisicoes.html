@@ -58,7 +58,7 @@
     .card-body {
         padding: 30px; /* Adiciona um espaço interno de 30px */
     }
-
+s
     .card-status:hover {
         transform: scale(1.05); /* Faz o card crescer um pouco */
     }
@@ -84,7 +84,7 @@
                     <p class="card-text"><b>Contrato:</b> {{ requisicao.contrato }}</p>
                     <p class="card-text"><b>CNPJ:</b> {{ requisicao.cnpj }}</p>
                     <p class="card-text"><b>Início do Contrato:</b> {{ requisicao.inicio_de_contrato|date:"d/m/Y" }}</p>
-                    <p class="card-text"><b>Vigência:</b> {{ requisicao.vigencia|date:"d/m/Y" }}</p>
+                    <p class="card-text"><b>Vigência:</b> {{ requisicao.vigencia }}</p>
                     <p class="card-text"><b>Data:</b> {{ requisicao.data|date:"d/m/Y" }}</p>
                     <p class="card-text"><b>Motivo:</b> {{ requisicao.motivo }}</p>
                     <p class="card-text"><b>Envio:</b> {{ requisicao.envio }}</p>
@@ -100,7 +100,8 @@
                     <p class="card-text"><b>Observações:</b> {{ requisicao.observacoes }}</p>
                     <p class="card-text"><b>TP:</b> {{ requisicao.TP }}</p>
                     <p class="card-text"><b>ID Equipamentos:</b> {{ requisicao.id_equipamentos }}</p>
-                    <!-- Outros detalhes do card -->
+                    <!-- Botão de Download -->
+                    <a class="btn btn-info" href="{% url 'download_pdf_requisicao' requisicao.id %}">Download PDF</a>
                 </div>
             </div>
         </div>

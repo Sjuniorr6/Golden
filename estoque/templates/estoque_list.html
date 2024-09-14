@@ -22,14 +22,14 @@
         </div>
 
     </div>
-
+    {% if perms.estoque.change_estoque %}
    <div class="row mb-3">
     <div class="col-md-12">
         <a href="{% url 'estoque_create' %}" class="btn btn-primary float-end">
             <i class="bi bi-box-arrow-in-up-right"></i> Registrar Entrada
         </a>
    </div>
-    
+   {% endif %}
 </div>
 
 </div>

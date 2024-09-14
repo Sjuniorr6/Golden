@@ -1,11 +1,15 @@
 from django.urls import path
 from . import views
+from .views import download_pdf_requisicao, enviar_email_com_pdf, get_cliente_data
 
-from django.urls import path
-from . import views
+
+
+    #-------------------------------------------------------------------------------------------------------------
 
 urlpatterns = [
-    #-------------------------------------------------------------------------------------------------------------
+    # Outras URLs
+    path('requisicao/<int:id>/download/', download_pdf_requisicao, name='download_pdf_requisicao'),
+    path('requisicao/<int:id>/enviar-email/', enviar_email_com_pdf, name='enviar_email_com_pdf'),
     path('requisicao/', views.RequisicoesViews.as_view(), name='requisicoes'),
     path('requisicaocreate', views.requisicoescrateview.as_view(), name='requisicoescrateview'),
     path('requisicoes/list', views.RequisicaoDetailView.as_view(), name='RequisicaoDetailView'),
@@ -48,6 +52,7 @@ path('requisicao/expedido/<int:id>/', views.expedicao_expedido, name='expedicao_
 path('manutencao/expedido/<int:id>/', views.expedicao_expedido2, name='expedicao_expedido2'),
 path('expedir_requisicao/<int:id>/', views.expedir_requisicao, name='expedir_requisicao'),
     path('expedir_manutencao/<int:id>/', views.expedir_manutencao, name='expedir_manutencao'),
+     path('get-cliente-data/<int:cliente_id>/', get_cliente_data, name='get_cliente_data'),
 
 
 

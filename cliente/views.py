@@ -11,7 +11,7 @@ class clienteviews(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     template_name = "cliente_list.html"
     context_object_name = 'cliente'
     paginate_by = 5
-    permission_required = 'cliente.view_Cliente'  # Substitua 'cliente' pelo nome do seu aplicativo
+    permission_required = 'cliente.view_cliente'  # Substitua 'cliente' pelo nome do seu aplicativo
 
     def get_queryset(self):
         queryset = super().get_queryset()

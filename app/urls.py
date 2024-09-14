@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     
+    path('', include('login.urls')),       
     path('admin/', admin.site.urls),
     path('home/', include('home.urls')),          
     path('produto/', include('produto.urls')),    
@@ -21,7 +22,6 @@ urlpatterns = [
     path('formulariov/', include('formulariov.urls')),        
     path('formularioe/', include('formularioe.urls')),        
     path('faturamento/', include('faturamento.urls')),  
-    path('', include('login.urls')),       
     path('register/', include('register.urls')),  
     path('requisicao/', include('requisicao.urls')),  
     path('registrodemanutencao/', include('registrodemanutencao.urls')),  
@@ -31,6 +31,7 @@ urlpatterns = [
     path('qualit/', include('qualit.urls')),  
     path('dashboard/', include('dashboard.urls')),  
     path('adm/', include('adm.urls')),  
+    path('iao_list/', include('IAO.urls')),
    
      
      

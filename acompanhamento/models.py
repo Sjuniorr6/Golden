@@ -25,10 +25,18 @@ class Clientes(models.Model):
         ("Rastreador","Rastreador"),
         ("Tets","Tets"),
     ]
+    contratos = [
+
+        ("",""),
+        ("Descartavel","Descartavel"),
+        ("Retornavel","Retornavel"),
+        
+    ]
 
     nome = models.CharField(max_length=100)
     endereco = models.CharField(max_length=255)
     cnpj = models.CharField(max_length=14)
+    tipo_contrato = models.CharField(choices=contratos, max_length=50, null=True,blank=True)
     inicio_de_contrato = models.DateField()
     vigencia = models.CharField(max_length=14)
     vigencia = models.CharField(choices=vigencia_tipo ,null=True,blank=True, max_length=50)

@@ -98,38 +98,34 @@
                     <th>Customização</th>
                     <th>ID Equipamento</th>
                     <th>Entregue / Retirado</th>
-                    
-                    
                     <th>Faturamento</th>
                     <th>Setor</th>
                     <th>Status</th>
                     <th>Customização Setor</th>
-                    
                     <th>Tratativa</th>
                     <th>Download</th>
                 </tr>
             </thead>
             <tbody>
                 {% for manutencao in dasentradas %}
-                <tr class="{% if manutencao.status == 'Aprovado Inteligência' %}status-aprovado-inteligencia{% elif manutencao.status == 'Reprovado Inteligência' %}status-reprovado-inteligencia{% endif %}">
-                    <td>{{ manutencao.id }}</td>
-                    <td>{{ manutencao.nome }}</td>
-                    <td>{{ manutencao.tipo_entrada }}</td>
-                    <td>{{ manutencao.tipo_produto }}</td>
-                    <td>{{ manutencao.motivo }}</td>
-                    <td>{{ manutencao.tipo_customizacao }}</td>
-                    <td>{{ manutencao.id_equipamentos }}</td>
-                    <td>{{ manutencao.entregue_por_retirado_por }}</td>
-                    <td>{{ manutencao.faturamento }}</td>
-                   
-                   
-                    <td>{{ manutencao.setor }}</td>
-                    <td>{{ manutencao.status }}</td>
-                    <td>{{ manutencao.customizacaoo }}</td>
-                    
-                    <td>{{ manutencao.tratativa }}</td>
-                    <td><a class="btn btn-info" href="{% url 'download_pdfmanutencao' manutencao.id %}">Download PDF</a></td>
-                </tr>
+                    {% if manutencao.status == 'Comercial' %}
+                        <tr class="status-Comercial">
+                            <td>{{ manutencao.id }}</td>
+                            <td>{{ manutencao.nome }}</td>
+                            <td>{{ manutencao.tipo_entrada }}</td>
+                            <td>{{ manutencao.tipo_produto }}</td>
+                            <td>{{ manutencao.motivo }}</td>
+                            <td>{{ manutencao.tipo_customizacao }}</td>
+                            <td>{{ manutencao.id_equipamentos }}</td>
+                            <td>{{ manutencao.entregue_por_retirado_por }}</td>
+                            <td>{{ manutencao.faturamento }}</td>
+                            <td>{{ manutencao.setor }}</td>
+                            <td>{{ manutencao.status }}</td>
+                            <td>{{ manutencao.customizacaoo }}</td>
+                            <td>{{ manutencao.tratativa }}</td>
+                            <td><a class="btn btn-info" href="{% url 'download_pdfmanutencao' manutencao.id %}">Download PDF</a></td>
+                        </tr>
+                    {% endif %}
                 {% endfor %}
             </tbody>
         </table>

@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'prestadores',    
     'regcliente',    
     'dashboard',    
+    'IAO',    
 ]
 
 MIDDLEWARE = [

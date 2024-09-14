@@ -38,7 +38,7 @@ class entradasListView( PermissionRequiredMixin,LoginRequiredMixin , ListView):
     permission_required = 'registrodemanutencao.view_registrodemanutencao'  # Substitua 'registrodemanutencao' pelo nome do seu aplicativo
     
     def get_queryset(self):
-        queryset = registrodemanutencao.objects.filter(status__in=['Pendente'])
+        queryset = registrodemanutencao.objects.filter(status__in=['Pendente','Reprovado pela Inteligência','Aprovado pela Diretoria'])
         return queryset
 #----------------------------------------------------------------------------
 
@@ -128,7 +128,7 @@ def aprovar_manut(request, id):
     registro.save()
     
     subject = f"Manutenção Aprovada: {registro.id}"
-    message = f"A manutenção {registro.id} foi aprovada com sucesso. {registro.nome} Status: {registro.status} criar Requisição"
+    message = f"A manutenção {registro.id} foi aprovada com sucesso. segue pdf para tratativa "
     from_email = settings.DEFAULT_FROM_EMAIL
     recipient_list = ['sjuniorr6@gmail.com']
     
@@ -203,10 +203,19 @@ class configDetailView(LoginRequiredMixin, DetailView):
       # Substitua 'registrodemanutencao' pelo nome do seu aplicativo
 
 
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib import colors
+from reportlab.pdfgen import canvas
+from django.http import HttpResponse
+import os
+from django.conf import settings
 
 from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
+from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib import colors
+from reportlab.pdfgen import canvas
+from reportlab.platypus import Paragraph  # Adicione esta linha
 from django.http import HttpResponse
 import os
 from django.conf import settings
@@ -230,7 +239,7 @@ def download_pdf(request, pk):
     p.drawString(100, y_position, "Relatório de Manutenção")
     y_position -= 30
 
-    # Adicionar imagens
+    # Adicionar imagens de cabeçalho
     imagem_padrao = os.path.join(settings.MEDIA_ROOT, 'imagens_registros/SIDNEISIDNEISIDNEI.png')
     imagem_qrcode = os.path.join(settings.MEDIA_ROOT, 'imagens_registros/qrcode.png')
     image_width, image_height = 200, 100
@@ -247,24 +256,21 @@ def download_pdf(request, pk):
     p.setFont("Helvetica", 12)
     p.setFillColor(colors.black)
 
-    def draw_text(p, text, x, y, max_width):
-        lines = text.split('\n')
-        for line in lines:
-            if p.stringWidth(line, "Helvetica", 12) > max_width:
-                words = line.split(' ')
-                current_line = ""
-                for word in words:
-                    if p.stringWidth(current_line + word, "Helvetica", 12) < max_width:
-                        current_line += word + " "
-                    else:
-                        p.drawString(x, y, current_line)
-                        y -= 20
-                        current_line = word + " "
-                p.drawString(x, y, current_line)
-                y -= 20
-            else:
-                p.drawString(x, y, line)
-                y -= 20
+    def draw_text(p, theme, value, x, y, max_width):
+        theme_style = ParagraphStyle('ThemeStyle', fontName='Helvetica-Bold', fontSize=12)
+        value_style = ParagraphStyle('ValueStyle', fontName='Helvetica', fontSize=12)
+        
+        theme_paragraph = Paragraph(f"<b>{theme}</b>", theme_style)
+        value_paragraph = Paragraph(value, value_style)
+        
+        theme_width, theme_height = theme_paragraph.wrap(max_width, y)
+        value_width, value_height = value_paragraph.wrap(max_width, y)
+        
+        theme_paragraph.drawOn(p, x, y - theme_height)
+        y -= theme_height
+        value_paragraph.drawOn(p, x, y - value_height)
+        y -= value_height + 10  # Espaçamento entre linhas
+        
         return y
 
     def check_space(p, y_position, required_space):
@@ -275,92 +281,106 @@ def download_pdf(request, pk):
             return 750
         return y_position
 
-    y_position = draw_text(p, f"Nome: {registro.nome}", 100, y_position, 400)
-    y_position = draw_text(p, f"Tipo de Entrada: {registro.tipo_entrada}", 100, y_position, 400)
-    y_position = draw_text(p, f"Tipo de Produto: {registro.tipo_produto}", 100, y_position, 400)
-    y_position = draw_text(p, f"Motivo: {registro.motivo}", 100, y_position, 400)
-    y_position = draw_text(p, f"Tipo Customização: {registro.tipo_customizacao}", 100, y_position, 400)
-    y_position = draw_text(p, f"Entregue por/Retirado por: {registro.entregue_por_retirado_por}", 100, y_position, 400)
-    y_position = draw_text(p, f"Recebimento: {registro.recebimento}", 100, y_position, 400)
-   
-    y_position = draw_text(p, f"Faturamento: {registro.faturamento}", 100, y_position, 400)
-    y_position = draw_text(p, f"Setor: {registro.setor}", 100, y_position, 400)
-    y_position = draw_text(p, f"Customização: {registro.customizacaoo}", 100, y_position, 400)
-    y_position = draw_text(p, f"Número Equipamento: {registro.numero_equipamento}", 100, y_position, 400)
-    y_position = draw_text(p, f"Tratativa: {registro.tratativa}", 100, y_position, 400)
-    y_position = draw_text(p, f"Status: {registro.status}", 100, y_position, 400)
+    def safe_draw_text(p, theme, value, x, y, max_width):
+        if isinstance(value, str):
+            return draw_text(p, theme, value, x, y, max_width)
+        else:
+            return draw_text(p, theme, str(value), x, y, max_width)
+
+    def add_text_with_check(p, theme, value, x, y, max_width):
+        required_space = 50  # Espaço necessário para cada entrada de texto
+        y = check_space(p, y, required_space)
+        return safe_draw_text(p, theme, value, x, y, max_width)
+
+    def draw_image(p, image_path, x, y, width, height):
+        if y - height < 50:
+            p.showPage()
+            y = 750
+        p.drawImage(image_path, x, y - height, width=width, height=height)
+        return y - height - 10  # Espaçamento entre imagens
+
+    y_position = add_text_with_check(p, "Nome:", registro.nome, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Tipo de Entrada:", registro.tipo_entrada, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Tipo de Produto:", registro.tipo_produto, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Motivo:", registro.motivo, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Tipo Customização:", registro.tipo_customizacao, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Entregue por/Retirado por:", registro.entregue_por_retirado_por, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Recebimento:", registro.recebimento, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Faturamento:", registro.faturamento, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Setor:", registro.setor, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Customização:", registro.customizacaoo, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Número Equipamento:", registro.numero_equipamento, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Tratativa:", registro.tratativa, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Status:", registro.status, 100, y_position, 400)
 
     # Iterar sobre todas as imagens relacionadas e desenhá-las no PDF
-    
     for imagem in registro.imagens.all():
         if imagem.imagem:  # Verifique se a imagem existe
-            # Desenhe o ID da imagem, o setor e o tipo de problema
-            y_position = draw_text(p, f"ID: {imagem.id} - Descrição: {imagem.descricao} - Tipo Problema: {imagem.tipo_problema}", 100, y_position, 400)
+            y_position = add_text_with_check(p, "ID:", f"{imagem.id} - Descrição: {imagem.descricao} - Tipo Problema: {imagem.tipo_problema}", 100, y_position, 400)
 
             # Adicionar lógica para escrever texto explicativo no campo "tratativa"
             if imagem.tipo_problema == "Oxidação":
                 texto_tratativa = """
-            Sobre a Manutenção Realizada:
-            Para resolver o problema do equipamento,
-            foram realizadas as tratativas necessárias e alguns testes posteriores, porém,
-            sem sucesso, sendo assim será necessária a troca do dispositivo.
-            Atenciosamente,
-            Laboratório Técnico. 
-        """
+                Sobre a Manutenção Realizada:
+                Para resolver o problema do equipamento,
+                foram realizadas as tratativas necessárias e alguns testes posteriores, porém,
+                sem sucesso, sendo assim será necessária a troca do dispositivo.
+                Atenciosamente,
+                Laboratório Técnico. 
+                """
             elif imagem.tipo_problema == "Placa Danificada":
                 texto_tratativa = """
-            Sobre a Manutenção Realizada:
-            Para resolver o problema do equipamento,
-            foram realizadas as tratativas necessárias e alguns testes
-            posteriores, porém, sem sucesso, 
-            sendo assim será necessária a troca do dispositivo.
-            Atenciosamente,
-            Laboratório Técnico
-        """
+                Sobre a Manutenção Realizada:
+                Para resolver o problema do equipamento,
+                foram realizadas as tratativas necessárias e alguns testes
+                posteriores, porém, sem sucesso, 
+                sendo assim será necessária a troca do dispositivo.
+                Atenciosamente,
+                Laboratório Técnico
+                """
             elif imagem.tipo_problema == "Placa danificada SEM CUSTO":
                 texto_tratativa = """A placa do equipamento está danificada, 
                 mas a reparação será realizada sem custo."""
             elif imagem.tipo_problema == "USB Danificado":
                 texto_tratativa ="""
-            Sobre a Manutenção Realizada:
-            Para resolver o problema do equipamento, 
-            foram realizadas as tratativas necessárias e alguns testes posteriores,
-              porém, sem sucesso, sendo assim será necessária a troca do dispositivo.
-            Atenciosamente,
-            Laboratório Técnico.
-        """
+                Sobre a Manutenção Realizada:
+                Para resolver o problema do equipamento, 
+                foram realizadas as tratativas necessárias e alguns testes posteriores,
+                porém, sem sucesso, sendo assim será necessária a troca do dispositivo.
+                Atenciosamente,
+                Laboratório Técnico.
+                """
             elif imagem.tipo_problema == "USB Danificado SEM CUSTO":
                 texto_tratativa = """A porta USB do equipamento está danificada,
-                  mas a reparação será realizada sem custo."""
+                mas a reparação será realizada sem custo."""
             elif imagem.tipo_problema == "Botão de acionamento Danificado":
                 texto_tratativa = """O botão de acionamento do equipamento está danificado, 
                 dificultando seu uso."""
             elif imagem.tipo_problema == "Botão de acionamento Danificado SEM CUSTO":
                 texto_tratativa = """O botão de acionamento do equipamento está danificado,
-                  mas a reparação será realizada sem custo."""
+                mas a reparação será realizada sem custo."""
             elif imagem.tipo_problema == "Antena LoRa Danificada":
                 texto_tratativa = """
-            Sobre a Manutenção Realizada:
-            Diante deste diagnóstico e após as tratativas, 
-            afirmamos que será necessário a troca do dispositivo.
-            Atenciosamente,
-            Laboratório Técnico
-        """
+                Sobre a Manutenção Realizada:
+                Diante deste diagnóstico e após as tratativas, 
+                afirmamos que será necessário a troca do dispositivo.
+                Atenciosamente,
+                Laboratório Técnico
+                """
             elif imagem.tipo_problema == "Sem problemas Identificados":
                 texto_tratativa = """
-            Sobre a Manutenção Realizada:
-            Gostaríamos de informar que concluímos com sucesso as manutenções necessárias no equipamento
-              que nos foi confiado para reparo. Após uma análise cuidadosa,
+                Sobre a Manutenção Realizada:
+                Gostaríamos de informar que concluímos com sucesso as manutenções necessárias no equipamento
+                que nos foi confiado para reparo. Após uma análise cuidadosa,
                 identificamos e corrigimos os problemas que estavam impactando o seu funcionamento adequado.
-            Atenciosamente,
-            Laboratório Técnico. 
-        """
+                Atenciosamente,
+                Laboratório Técnico.
+                """
             else:
                 texto_tratativa = "Descrição genérica para problemas não especificados."
 
-            y_position = draw_text(p, f"Tratativa: {texto_tratativa}", 100, y_position, 400)
-
-            # Desenhe a imagem
+            y_position = add_text_with_check(p, "Tratativa:", texto_tratativa, 100, y_position, 400)
+                        # Desenhe a imagem
             caminho_imagem = os.path.join(settings.MEDIA_ROOT, str(imagem.imagem))
             if y_position - 100 < 50:  # Verifique se há espaço suficiente para a imagem na página atual
                 p.showPage()  # Crie uma nova página se necessário
@@ -372,7 +392,6 @@ def download_pdf(request, pk):
     p.showPage()
     p.save()
     return response
-
 
 
 class CriarRetornoView(CreateView):
@@ -480,7 +499,7 @@ class historico_manutencaoListView( PermissionRequiredMixin,LoginRequiredMixin ,
     permission_required = 'registrodemanutencao.view_registrodemanutencao'  # Substitua 'registrodemanutencao' pelo nome do seu aplicativo
     
     def get_queryset(self):
-        queryset = registrodemanutencao.objects.filter(status__in=['Aprovado Inteligência', 'Reprovado Inteligência','Reprovado pela Diretoria','Aprovado pela Diretoria','Enviado para o Cliente'])
+        queryset = registrodemanutencao.objects.filter(status__in=['Comercial', 'Reprovado Inteligência','Reprovado pela Diretoria','Aprovado pela Diretoria','Enviado para o Cliente'])
         nome = self.request.GET.get('nome')
         retornoequipamentos = self.request.GET.get('retornoequipamentos')
         
@@ -493,17 +512,222 @@ class historico_manutencaoListView( PermissionRequiredMixin,LoginRequiredMixin ,
         
         return queryset
 
+
+def clean_id_equipamentos(self):
+        data = self.cleaned_data['id_equipamentos']
+        if len(data) > 6:
+            data = data[6:]  # Remove os primeiros 6 caracteres
+        return data
+
+
+
+from django.core.mail import EmailMessage
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect
+from django.conf import settings
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import os
 @login_required
-def aprovar_manutencao(request, id):  # Alterar o nome da função para corresponder ao URL
-    requisicao = get_object_or_404(registrodemanutencao, id=id)
-    requisicao.status = 'Aprovado Inteligência'  # Certifique-se de que este é o status correto
-    requisicao.save()
+def aprovar_manutencao(request, id):
+    registro = get_object_or_404(registrodemanutencao, id=id)
+    registro.status = 'Comercial'
+    registro.save()
+    
+    subject = f"Manutenção Aprovada: {registro.id}"
+    message = f"A manutenção {registro.id} foi aprovada com sucesso. Segue PDF para tratativa."
+    from_email = settings.DEFAULT_FROM_EMAIL
+    recipient_list = ['sjuniorr6@gmail.com']
+    
+    # Gerar o PDF
+    pdf_path = os.path.join(settings.MEDIA_ROOT, f'registro-manutencao-{registro.id}.pdf')
+    p = canvas.Canvas(pdf_path, pagesize=letter)
+    p.setTitle(f'Registro de Manutenção - {registro.id}')
+
+    # Cabeçalho
+    p.setFont("Helvetica-Bold", 16)
+    p.setFillColor(colors.HexColor("#004B87"))
+    y_position = 750
+    p.drawString(100, y_position, "Relatório de Manutenção")
+    y_position -= 30
+
+    # Adicionar imagens de cabeçalho
+    imagem_padrao = os.path.join(settings.MEDIA_ROOT, 'imagens_registros/SIDNEISIDNEISIDNEI.png')
+    imagem_qrcode = os.path.join(settings.MEDIA_ROOT, 'imagens_registros/qrcode.png')
+    image_width, image_height = 200, 100
+    page_width, page_height = letter
+    total_width = image_width * 2 + 20
+    x_position = (page_width - total_width) / 2
+
+    p.setFillColor(colors.white)
+    p.rect(x_position - 10, y_position - image_height - 10, total_width + 20, image_height + 20, fill=1)
+    p.drawImage(imagem_padrao, x_position, y_position - image_height, width=image_width, height=image_height)
+    p.drawImage(imagem_qrcode, x_position + image_width + 20, y_position - image_height, width=image_width, height=image_height)
+    y_position -= (image_height + 20)
+
+    p.setFont("Helvetica", 12)
+    p.setFillColor(colors.black)
+
+    def draw_text(p, theme, value, x, y, max_width):
+        theme_style = ParagraphStyle('ThemeStyle', fontName='Helvetica-Bold', fontSize=12)
+        value_style = ParagraphStyle('ValueStyle', fontName='Helvetica', fontSize=12)
+        
+        theme_paragraph = Paragraph(f"<b>{theme}</b>", theme_style)
+        value_paragraph = Paragraph(value, value_style)
+        
+        theme_width, theme_height = theme_paragraph.wrap(max_width, y)
+        value_width, value_height = value_paragraph.wrap(max_width, y)
+        
+        theme_paragraph.drawOn(p, x, y - theme_height)
+        y -= theme_height
+        value_paragraph.drawOn(p, x, y - value_height)
+        y -= value_height + 10  # Espaçamento entre linhas
+        
+        return y
+
+    def check_space(p, y_position, required_space):
+        if y_position - required_space < 50:
+            p.showPage()
+            p.setFont("Helvetica", 12)
+            p.setFillColor(colors.black)
+            return 750
+        return y_position
+
+    def safe_draw_text(p, theme, value, x, y, max_width):
+        if isinstance(value, str):
+            return draw_text(p, theme, value, x, y, max_width)
+        else:
+            return draw_text(p, theme, str(value), x, y, max_width)
+
+    def add_text_with_check(p, theme, value, x, y, max_width):
+        required_space = 50  # Espaço necessário para cada entrada de texto
+        y = check_space(p, y, required_space)
+        return safe_draw_text(p, theme, value, x, y, max_width)
+
+    def draw_image(p, image_path, x, y, width, height):
+        if y - height < 50:
+            p.showPage()
+            y = 750
+        p.drawImage(image_path, x, y - height, width=width, height=height)
+        return y - height - 10  # Espaçamento entre imagens
+
+    y_position = add_text_with_check(p, "Nome:", registro.nome, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Tipo de Entrada:", registro.tipo_entrada, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Tipo de Produto:", registro.tipo_produto, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Motivo:", registro.motivo, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Tipo Customização:", registro.tipo_customizacao, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Entregue por/Retirado por:", registro.entregue_por_retirado_por, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Recebimento:", registro.recebimento, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Faturamento:", registro.faturamento, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Setor:", registro.setor, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Customização:", registro.customizacaoo, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Número Equipamento:", registro.numero_equipamento, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Tratativa:", registro.tratativa, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Status:", registro.status, 100, y_position, 400)
+
+    # Iterar sobre todas as imagens relacionadas e desenhá-las no PDF
+    for imagem in registro.imagens.all():
+        if imagem.imagem:  # Verifique se a imagem existe
+            y_position = add_text_with_check(p, "ID:", f"{imagem.id} - Descrição: {imagem.descricao} - Tipo Problema: {imagem.tipo_problema}", 100, y_position, 400)
+
+            # Adicionar lógica para escrever texto explicativo no campo "tratativa"
+            if imagem.tipo_problema == "Oxidação":
+                texto_tratativa = """
+                Sobre a Manutenção Realizada:
+                Para resolver o problema do equipamento,
+                foram realizadas as tratativas necessárias e alguns testes posteriores, porém,
+                sem sucesso, sendo assim será necessária a troca do dispositivo.
+                Atenciosamente,
+                Laboratório Técnico. 
+                """
+            elif imagem.tipo_problema == "Placa Danificada":
+                texto_tratativa = """
+                Sobre a Manutenção Realizada:
+                Para resolver o problema do equipamento,
+                foram realizadas as tratativas necessárias e alguns testes
+                posteriores, porém, sem sucesso, 
+                sendo assim será necessária a troca do dispositivo.
+                Atenciosamente,
+                Laboratório Técnico
+                """
+            elif imagem.tipo_problema == "Placa danificada SEM CUSTO":
+                texto_tratativa = """A placa do equipamento está danificada, 
+                mas a reparação será realizada sem custo."""
+            elif imagem.tipo_problema == "USB Danificado":
+                texto_tratativa ="""
+                Sobre a Manutenção Realizada:
+                Para resolver o problema do equipamento, 
+                foram realizadas as tratativas necessárias e alguns testes posteriores,
+                porém, sem sucesso, sendo assim será necessária a troca do dispositivo.
+                Atenciosamente,
+                Laboratório Técnico.
+                """
+            elif imagem.tipo_problema == "USB Danificado SEM CUSTO":
+                texto_tratativa = """A porta USB do equipamento está danificada,
+                mas a reparação será realizada sem custo."""
+            elif imagem.tipo_problema == "Botão de acionamento Danificado":
+                texto_tratativa = """O botão de acionamento do equipamento está danificado, 
+                dificultando seu uso."""
+            elif imagem.tipo_problema == "Botão de acionamento Danificado SEM CUSTO":
+                texto_tratativa = """O botão de acionamento do equipamento está danificado,
+                mas a reparação será realizada sem custo."""
+            elif imagem.tipo_problema == "Antena LoRa Danificada":
+                texto_tratativa = """
+                Sobre a Manutenção Realizada:
+                Diante deste diagnóstico e após as tratativas, 
+                afirmamos que será necessário a troca do dispositivo.
+                Atenciosamente,
+                Laboratório Técnico
+                """
+            elif imagem.tipo_problema == "Sem problemas Identificados":
+                texto_tratativa = """
+                Sobre a Manutenção Realizada:
+                Gostaríamos de informar que concluímos com sucesso as manutenções necessárias no equipamento
+                que nos foi confiado para reparo. Após uma análise cuidadosa,
+                identificamos e corrigimos os problemas que estavam impactando o seu funcionamento adequado.
+                Atenciosamente,
+                Laboratório Técnico.
+                """
+            else:
+                texto_tratativa = "Descrição genérica para problemas não especificados."
+
+            y_position = add_text_with_check(p, "Tratativa:", texto_tratativa, 100, y_position, 400)
+            # Desenhe a imagem
+            caminho_imagem = os.path.join(settings.MEDIA_ROOT, str(imagem.imagem))
+            if y_position - 100 < 50:  # Verifique se há espaço suficiente para a imagem na página atual
+                p.showPage()  # Crie uma nova página se necessário
+                y_position = 750  # Redefina a posição Y para o topo da nova página
+            p.drawImage(caminho_imagem, 100, y_position - 100, width=200, height=100)
+            y_position -= 120
+
+    # Feche o objeto PDF e salve no caminho especificado.
+    p.showPage()
+    p.save()
+
+    # Enviar e-mail com o PDF anexado
+    email = EmailMessage(subject, message, from_email, recipient_list)
+    email.attach_file(pdf_path)
+    
+    try:
+        email.send()
+        print("Email enviado com sucesso.")
+    except Exception as e:
+        print(f"Erro ao enviar email: {e}")
+    
     return redirect('entradasListView')
 
 @login_required
 def reprovar_manutencao(request, id):  # Alterar o nome da função para corresponder ao URL
     requisicao = get_object_or_404(registrodemanutencao, id=id)
     requisicao.status = 'Manutenção'  # Certifique-se de que este é o status correto
+    requisicao.save()
+    return redirect('entradasListView')
+
+
+@login_required
+def reprovar_manutencao2(request, id):  # Alterar o nome da função para corresponder ao URL
+    requisicao = get_object_or_404(registrodemanutencao, id=id)
+    requisicao.status = 'Reprovado pela Inteligência'  # Certifique-se de que este é o status correto
     requisicao.save()
     return redirect('entradasListView')
 

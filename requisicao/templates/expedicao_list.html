@@ -92,7 +92,8 @@
                     <p class="card-text"><b>TP:</b> {{ registro.TP }}</p>
                     <p class="card-text"><b>Status de Faturamento:</b> {{ registro.status_faturamento }}</p>
                     <p class="card-text"><b>ID Equipamentos:</b> {{ registro.id_equipamentos }}</p>
-                    <a href="{% url 'expedicao_expedido' registro.id %}" class="btn btn-primary">Expedição</a>
+                    <a href="{% url 'expedicao_expedido' registro.id %}" class="btn btn-primary">Enviar ao Cliente</a>
+                    <a class="btn btn-info" href="{% url 'download_pdf_requisicao' registro.id %}">Download PDF</a>
                     {% else %}
                     <h3>Manutenção</h3>
                     <h5 class="card-title">Registro #{{ registro.id }}</h5>
@@ -111,7 +112,8 @@
                     <p class="card-text"><b>Manutenção Equipamento:</b> {{ registro.manutencaoequipamentos }}</p>
                     <p class="card-text"><b>Retorno Equipamento:</b> {{ registro.retornoequipamentos }}</p>
                     <p class="card-text"><b>Setor:</b> {{ registro.setor }}</p>
-                    <a href="{% url 'expedicao_expedido2' registro.id %}" class="btn btn-primary">Expedição</a>
+                    <a href="{% url 'expedicao_expedido2' registro.id %}" class="btn btn-primary">Enviar ao Cliente</a>
+                    <a class="btn btn-info" href="{% url 'download_pdfmanutencao' registro.id %}">Download PDF</a>
                     {% endif %}
                 </div>
             </div>

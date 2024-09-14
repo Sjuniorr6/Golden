@@ -20,7 +20,8 @@ from .views import (
     download_pdf,
     CriarRetornoView,
     DownloadPDFView,
-    ListaRetornosView
+    ListaRetornosView,
+    reprovar_manutencao2
 )
 urlpatterns = [
     path('configlist/historico', historico_manutencaoListView.as_view(), name='historico_manutencaoListView'),
@@ -30,6 +31,7 @@ urlpatterns = [
     path('registrodemanutencao/<int:pk>/detail/', FormularioDetailView.as_view(), name='FormularioDetailView'),
     path('aprovado/<int:id>/', aprovar_manutencao, name='Aprovado_Inteligência'),
     path('reprovado/<int:id>/', reprovar_manutencao, name='Reprovado_Inteligência'),
+    path('reprovado2/<int:id>/', reprovar_manutencao2, name='Reprovado_Inteligência2'),
     path('manutencaonova/<int:id>/', CreateView.as_view(), name='manutencaonova'),
     path('download-pdf/<int:pk>/', download_pdf, name='download_pdfmanutencao'),
     path('lista_retornos/', ListaRetornosView.as_view(), name='lista_retornos'),

@@ -137,7 +137,7 @@ class Requisicoes(models.Model):
     inicio_de_contrato = models.DateField(blank=True, null=True)
     vigencia = models.CharField(max_length=50,choices=meses,blank=True, null=True)
     customizacao = models.CharField(max_length=50,choices=meses,blank=True, null=True)
-    data = models.DateField()
+    data = models.DateField(auto_now=True)
     tipo_customizacao = models.CharField(choices=customizacoes ,null=True,blank=True, max_length=50)
     motivo = models.CharField(choices=motivoc,  default='', null=True, blank=True, max_length=50)
     envio = models.CharField(choices=tipo_envio, null=True, blank=True, max_length=50)

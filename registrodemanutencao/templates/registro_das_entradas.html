@@ -84,12 +84,14 @@
                     <p class="card-text"><b>Motivo:</b> {{ registro.motivo }}</p>
                     <p class="card-text"><b>Setor:</b> {{ registro.setor }}</p>
                     <!-- Botões de ação -->
-                    <a class="btn btn-primary" href="{% url 'FormulariosUpdateView' registro.id %}">Editar</a>
                     <a class="btn btn-primary" href="{% url 'FormularioDetailView' registro.id %}">Visualizar</a>
+                    {% if perms.registrodemanutencao.change_registrodemanutencao %}
+                    <a class="btn btn-primary" href="{% url 'FormulariosUpdateView' registro.id %}">Editar</a>
                     <a class="btn btn-success" href="{% url 'Aprovado_Inteligência' registro.id %}">Aprovar</a>
                     <a class="btn btn-danger" href="{% url 'Reprovado_Inteligência' registro.id %}">Diretoria</a>
+                    <a class="btn btn-danger" href="{% url 'Reprovado_Inteligência2' registro.id %}">Reprovado</a>
                     <a class="btn btn-info" href="{% url 'download_pdfmanutencao' registro.id %}">Download PDF</a>
-            
+                    {% endif %}
                     {% if registro.has_retorno_images %}
                     <a class="btn btn-warning" href="{% url 'download_laudo_saida' registro.id %}">Laudo de Saída</a>
                     {% endif %}
