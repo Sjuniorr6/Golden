@@ -11,9 +11,15 @@ class FormulariosForm(forms.ModelForm):
         model = registrodemanutencao
         fields = [
             'nome', 'tipo_produto',
+
+            'tipo_entrada', 'customizacaoo', 'numero_equipamento' ,'quantidade',
+             'status',
+            'entregue_por_retirado_por', 'setor','observacoes',
+
             'tipo_entrada', 'customizacaoo', 'numero_equipamento', 
              'status',
             'entregue_por_retirado_por', 'setor'
+
         ]
         widgets = {
             'nome': forms.Select(attrs={'class': 'form-control'}),
@@ -22,10 +28,17 @@ class FormulariosForm(forms.ModelForm):
             'tipo_entrada': forms.Select(attrs={'class': 'form-control'}),
          
             'entregue_por_retirado_por': forms.Select(attrs={'class': 'form-control'}),
+
+           'observacoes': forms.TextInput(attrs={'class': 'form-control'}),
+            'customizacaoo': forms.Select(attrs={'class': 'form-control', 'rows': 3}),
+            'numero_equipamento': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'quantidade': forms.TextInput(attrs={'class': 'form-control'}),
+
            
             'customizacaoo': forms.Select(attrs={'class': 'form-control', 'rows': 3}),
             'numero_equipamento': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
            
+
             
             'status': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
             'setor': forms.Select(attrs={'class': 'form-control'}),
@@ -64,14 +77,14 @@ from django.forms import inlineformset_factory
 ImagemRegistroFormSet = inlineformset_factory(
     registrodemanutencao,
     ImagemRegistro,
-    fields=('imagem', 'descricao', 'setorid', 'tipo_problema'),
+    fields=('imagem',  'id_equipamento' ,'tipo_problema'),
     extra=1,
     can_delete=True,
     widgets={
         'imagem': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-        'descricao': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-        'setorid': forms.Select(attrs={'class': 'form-control'}),
-        'tipo_problema': forms.Select(attrs={'class': 'form-control'}),
+        'id_equipamento': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+      
+        
     }
 )
 
@@ -83,7 +96,7 @@ class RetornoForm(forms.ModelForm):
         ]
         widgets = {
             'cliente': forms.Select(attrs={'class': 'form-control'}),
-            'id_equipamentos': forms.TextInput(attrs={'class': 'form-control'}),
+            'id_equipamentos': forms.Textarea(attrs={'class': 'form-control'}),
             'produto': forms.Select(attrs={'class': 'form-control'}),
             'tipo_problema': forms.Select(attrs={'class': 'form-control'}),
             'imagem': forms.ClearableFileInput(attrs={'class': 'form-control'}),

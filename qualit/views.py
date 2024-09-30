@@ -7,7 +7,7 @@ from .models import Qualit
 from .forms import QualitForm
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
-class QualitCreateView( PermissionRequiredMixin,LoginRequiredMixin, CreateView):
+class QualitCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     model = Qualit
     form_class = QualitForm
     template_name = 'criar_qualit.html'
@@ -27,7 +27,7 @@ class QualitCreateView( PermissionRequiredMixin,LoginRequiredMixin, CreateView):
         print(form.errors)  # Adicione esta linha para imprimir os erros do formulário
         return super().form_invalid(form)
 
-class QualitListView( PermissionRequiredMixin,LoginRequiredMixin, ListView):
+class QualitListView(PermissionRequiredMixin, LoginRequiredMixin, ListView):
     model = Qualit
     template_name = 'listar_qualits.html'
     context_object_name = 'qualits'
@@ -38,17 +38,17 @@ class QualitListView( PermissionRequiredMixin,LoginRequiredMixin, ListView):
         id_equipamento = self.request.GET.get('id_equipamento')
         iccid_novo = self.request.GET.get('iccid_novo')
         cliente = self.request.GET.get('cliente')
-
+        
         if id_equipamento or iccid_novo or cliente:
             if id_equipamento:
-                queryset = queryset.filter(id_equipamento__icontains=id_equipamento)
+                queryset = queryset.filter(id_equipamento=id_equipamento)
             if iccid_novo:
-                queryset = queryset.filter(iccid_novo__icontains=iccid_novo)
+                queryset = queryset.filter(iccid_novo=iccid_novo)
             if cliente:
-                queryset = queryset.filter(cliente__nome__icontains=cliente)
+                queryset = queryset.filter(cliente__iexact=cliente)
         else:
             queryset = queryset.none()
-
+        
         return queryset
 
 @login_required

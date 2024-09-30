@@ -6,7 +6,6 @@ from .models import Formulario
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from itertools import chain
-
 class FaturamentoListView(PermissionRequiredMixin, LoginRequiredMixin, ListView):
     model = Requisicoes
     template_name = "faturamento_list.html"
@@ -15,7 +14,7 @@ class FaturamentoListView(PermissionRequiredMixin, LoginRequiredMixin, ListView)
     permission_required = 'faturamento.view_formulario'  # Substitua 'faturamento' pelo nome do seu aplicativo
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().order_by('-id')  # Ordena por ID em ordem decrescente
         data_inicio = self.request.GET.get('data_inicio')
         data_fim = self.request.GET.get('data_fim')
         status_faturamento = self.request.GET.get('status_faturamento_filtro')
@@ -66,6 +65,7 @@ def update_status_faturamento(request, id):
         requisicao.save()
     return redirect('faturamento_list')
 
+
 class contratosListView(PermissionRequiredMixin, LoginRequiredMixin, ListView):
     model = Requisicoes
     template_name = "contrato_list.html"
@@ -79,3 +79,24 @@ class formularioCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateVi
     form_class = forms.FormularioForm
     success_url = reverse_lazy('formulario_create')
     permission_required = 'faturamento.add_formulario'  # Substitua 'faturamento' pelo nome do seu aplicativo
+
+from formacompanhamento.models import Formacompanhamento
+class FinanceirohListViews(ListView):
+    model = Formacompanhamento  # Defina o modelo aqui
+    template_name = "historicodeacionamento.html"  # Substitua pelo nome do seu template
+    context_object_name = 'financeiro_list'
+    paginate_by = 10
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
+
+
+
+def atualizar_observacoes(request, id):
+    registro = get_object_or_404(Requisicoes, id=id)
+    if request.method == 'POST':
+        observacoes = request.POST.get('observacoes')
+        registro.observacoes = observacoes
+        registro.save()
+        return redirect('faturamento_list')  # Redireciona para

@@ -4,9 +4,9 @@ from django.contrib import admin
 from . import models 
 
 class estoqueadmin(admin.ModelAdmin):
-    list_display = ('nome', 'descricao',)
-    search_fields = ('nome',)
+    list_display = ('produto', 'descricao',)
+    search_fields = ('produto',)
 
-admin.site.register(models.estoque,estoqueadmin)
+admin.site.register(models.Estoque,estoqueadmin)
 
 

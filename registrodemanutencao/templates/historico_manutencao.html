@@ -12,7 +12,7 @@
         background-color: #45494E; /* Cor de fundo mais escura */
         display: flex;
         flex-direction: column;
-        height: 100vh;
+        height: 90vh;
         margin: 0;
     }
     .container-fluid {
@@ -23,8 +23,8 @@
     }
     .table-responsive {
         padding: 0 15px;
-        margin-left: -55vh;
-        width: 160rem;
+        margin-left: -40vh;
+        width: 110rem;
     }
     .form-control {
         width: 100%;
@@ -103,6 +103,7 @@
                     <th>Status</th>
                     <th>Customização Setor</th>
                     <th>Tratativa</th>
+                    <th>Observações</th>
                     <th>Download</th>
                 </tr>
             </thead>
@@ -123,6 +124,9 @@
                             <td>{{ manutencao.status }}</td>
                             <td>{{ manutencao.customizacaoo }}</td>
                             <td>{{ manutencao.tratativa }}</td>
+
+                            <td>{{ manutencao.observações }}</td>
+
                             <td><a class="btn btn-info" href="{% url 'download_pdfmanutencao' manutencao.id %}">Download PDF</a></td>
                         </tr>
                     {% endif %}

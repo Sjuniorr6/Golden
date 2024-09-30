@@ -12,9 +12,8 @@
         background-color: #45494E; /* Cor de fundo mais escura */
         display: flex;
         flex-direction: column;
-        height: 100rem;
+        height: 80rem;
         margin: 0px;
-
     }
     .container-fluid {
         padding: 0;
@@ -24,7 +23,7 @@
     }
     .table-responsive {
         padding: 0 15px;
-        margin-left: -53vh;
+        margin-left: -55vh;
         width: 160rem;
     }
     .form-control {
@@ -143,6 +142,7 @@
                     <th>Observações</th>
                     <th>TP</th>
                     <th>Status Faturamento</th>
+                
                 </tr>
             </thead>
             <tbody>
@@ -167,7 +167,13 @@
                     <td>{{ registro.valor_unitario }}</td>
                     <td>{{ registro.valor_total }}</td>
                     <td>{{ registro.forma_pagamento }}</td>
-                    <td>{{ registro.observacoes }}</td>
+                    <td>
+                        <form method="post" action="{% url 'atualizar_observacoes' registro.id %}">
+                            {% csrf_token %}
+                            <input type="text" name="observacoes" class="form-control" value="{{ registro.observacoes }}">
+                            <button type="submit" class="btn btn-primary mt-2">Atualizar</button>
+                        </form>
+                    </td>
                     <td>{{ registro.TP }}</td>
                     <td>
                         <form method="post" action="{% url 'atualizar_status_faturamento' registro.id %}">
@@ -183,7 +189,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="22" class="text-center">Nenhum registro encontrado.</td>
+                    <td colspan="23" class="text-center">Nenhum registro encontrado.</td>
                 </tr>
                 {% endfor %}
             </tbody>

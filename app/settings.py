@@ -47,7 +47,9 @@ INSTALLED_APPS = [
     'prestadores',    
     'regcliente',    
     'dashboard',    
-    'IAO',    
+    'IAO',   
+    't42', 
+
 ]
 
 MIDDLEWARE = [
@@ -63,7 +65,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'app.urls'
 
-ALLOWED_HOSTS = ['10.0.0.227', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['10.0.0.227', 'localhost', '10.0.0.196']
 
 TEMPLATES = [
     {

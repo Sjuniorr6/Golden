@@ -111,11 +111,15 @@ class registrodemanutencao(models.Model):
     recebimento = models.CharField(choices=RECEBIMENTO_TIPO, null=True, blank=True, max_length=50)
     entregue_por_retirado_por = models.CharField(choices=RECEBIMENTO_TIPO,max_length=50, default="")
     id_equipamentos = models.TextField(max_length=1200, blank=True, default='')
+    quantidade = models.TextField(max_length=50, blank=True, default='')
+
+
     
     faturamento = models.CharField(choices=FATURAMENTO, null=True, blank=True, max_length=50)
     setor = models.CharField(choices=SETOR, null=True, blank=True, max_length=50)
     customizacaoo = models.CharField(choices=custom,max_length=250, blank=True, default='')
-    numero_equipamento = models.TextField(max_length=250, blank=True, default='')
+    numero_equipamento = models.TextField(max_length=2500, blank=True, default='')
+    observacoes = models.TextField(max_length=250, blank=True, default='')
     tratativa = models.CharField(choices=TRATATIVAS, null=True, blank=True, max_length=50)
     imagem = models.ImageField(upload_to='imagens/', null=True, blank=True)
     status = models.CharField(default='Pendente', max_length=50, null=True, blank=True)
@@ -146,8 +150,8 @@ class ImagemRegistro(models.Model):
     tipo_problema = models.CharField(choices=TIPO_PROBLEMAS, null=True, blank=True, max_length=50)
     registro = models.ForeignKey(registrodemanutencao, related_name='imagens', on_delete=models.CASCADE)
     imagem = models.ImageField(upload_to='imagens_registros/')
-    descricao = models.CharField(max_length=255, blank=True)
-    setorid = models.CharField(choices=SETORID, default='', max_length=50, null=True, blank=True)
+    id_equipamento = models.CharField(max_length=255, blank=True)
+
     def __str__(self):
         
         descricao_display = f": {self.descricao}" if self.descricao else ""
@@ -169,7 +173,7 @@ class retorno(models.Model):
         ('Sem problemas Identificados', 'Sem problemas Identificados'),
     ])
     imagem = models.ImageField(upload_to='imagens/')
-    id_equipamentos = models.TextField(max_length=250, blank=True, default='')
+    id_equipamentos = models.TextField(max_length=1000, blank=True, default='')
 
     def __str__(self):
         return f"{self.cliente} - {self.produto} - {self.tipo_problema}" 

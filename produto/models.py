@@ -1,11 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import User
+
 class Produto(models.Model):
     nome = models.CharField(max_length=100)
-    marca = models.TextField(null=True, blank=True)
-    quantidade = models.IntegerField(null=True, blank=True)
-    descricao = models.TextField()
-    preco = models.IntegerField(null=True, blank=True)
-   
+    quantidade = models.IntegerField(default=0, null=True, blank=True)
+
     def __str__(self):
-     return self.nome
+        return self.nome

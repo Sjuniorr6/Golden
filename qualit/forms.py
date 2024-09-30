@@ -6,10 +6,10 @@ class QualitForm(forms.ModelForm):
         model = Qualit
         fields = [
             'data', 'numero_requisicao', 'tipo_pedido', 'comercial', 'cliente', 'imei', 'id_equipamento', 'device_id', 
-            'iccid_novo', 'contrato', 'modelo', 'tp', 'operadora', 'usuario','observacoes'
+            'iccid_novo', 'contrato', 'modelo', 'tp', 'operadora', 'usuario','observacoes','customizacao'
         ]
         widgets = {
-            'data': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'data': forms.TextInput(attrs={'class': 'form-control'}),
             'numero_requisicao': forms.TextInput(attrs={'class': 'form-control'}),
             'tipo_pedido': forms.Select(attrs={'class': 'form-control'}),
             'comercial': forms.TextInput(attrs={'class': 'form-control'}),
@@ -22,8 +22,9 @@ class QualitForm(forms.ModelForm):
             'modelo': forms.Select(attrs={'class': 'form-control'}),
             'tp': forms.Select(attrs={'class': 'form-control'}),
             'operadora': forms.Select(attrs={'class': 'form-control'}),
+            'usuario': forms.TextInput(attrs={'class': 'form-control'}),  # Campo oculto
             'observacoes': forms.TextInput(attrs={'class': 'form-control'}),
-            'usuario': forms.HiddenInput(),  # Campo oculto
+            'customizacao': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):

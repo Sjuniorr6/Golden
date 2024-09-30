@@ -8,7 +8,8 @@
 <style>
     .card-status {
         position: relative;
-        transition: transform 0.3s ease; /* Adiciona uma transição suave */
+        transition: transform 0.3s ease;
+        width: 21rem; /* Adiciona uma transição suave */
     }
 
     .card-status.Aprovado {
@@ -58,7 +59,7 @@
     .card-body {
         padding: 30px; /* Adiciona um espaço interno de 30px */
     }
-s
+
     .card-status:hover {
         transform: scale(1.05); /* Faz o card crescer um pouco */
     }
@@ -101,7 +102,7 @@ s
                     <p class="card-text"><b>TP:</b> {{ requisicao.TP }}</p>
                     <p class="card-text"><b>ID Equipamentos:</b> {{ requisicao.id_equipamentos }}</p>
                     <!-- Botão de Download -->
-                    <a class="btn btn-info" href="{% url 'download_pdf_requisicao' requisicao.id %}">Download PDF</a>
+                 
                 </div>
             </div>
         </div>

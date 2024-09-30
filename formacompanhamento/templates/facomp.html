@@ -64,7 +64,6 @@
     }
 </style>
 
-
 <div class="row mb-12">
     <div class="coll-md-12">
         <form method="get" action="{% url 'acompanhamento_requisicao' %}">
@@ -93,6 +92,9 @@
                     <div class='buttons'>
                         <!-- Botões de ação podem ser adicionados aqui -->
                     </div>
+                    <div>
+                        <a href="{% url 'ceoListViews' %}" class="btn btn-secondary mt3"> Incluir INFO</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -101,4 +103,5 @@
 </div>
 
 {% include 'components/_pagination.html' %}
+
 {% endblock %}

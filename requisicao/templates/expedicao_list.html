@@ -5,7 +5,8 @@
 <style>
     .card-status {
         position: relative;
-        transition: transform 0.3s ease; /* Adiciona uma transição suave */
+        transition: transform 0.3s ease; 
+        width: 21rem;/* Adiciona uma transição suave */
     }
 
     .card-status.Aprovado {
@@ -74,23 +75,20 @@
                     <p class="card-text"><b>Endereço:</b> {{ registro.endereco }}</p>
                     <p class="card-text"><b>Contrato:</b> {{ registro.contrato }}</p>
                     <p class="card-text"><b>CNPJ:</b> {{ registro.cnpj }}</p>
-                    <p class="card-text"><b>Início de Contrato:</b> {{ registro.inicio_de_contrato }}</p>
-                    <p class="card-text"><b>Vigência:</b> {{ registro.vigencia }}</p>
+                    
                     <p class="card-text"><b>Data:</b> {{ registro.data }}</p>
                     <p class="card-text"><b>Motivo:</b> {{ registro.motivo }}</p>
                     <p class="card-text"><b>Envio:</b> {{ registro.envio }}</p>
                     <p class="card-text"><b>Comercial:</b> {{ registro.comercial }}</p>
+                    <p class="card-text"><b>Taxa de Envio:</b> {{ registro.taxa_envio }}</p>
                     <p class="card-text"><b>Tipo de Produto:</b> {{ registro.tipo_produto }}</p>
                     <p class="card-text"><b>Carregador:</b> {{ registro.carregador }}</p>
                     <p class="card-text"><b>Cabo:</b> {{ registro.cabo }}</p>
-                    <p class="card-text"><b>Tipo de Fatura:</b> {{ registro.tipo_fatura }}</p>
-                    <p class="card-text"><b>Valor Unitário:</b> {{ registro.valor_unitario }}</p>
-                    <p class="card-text"><b>Valor Total:</b> {{ registro.valor_total }}</p>
-                    <p class="card-text"><b>Forma de Pagamento:</b> {{ registro.forma_pagamento }}</p>
+                  
+                    
                     <p class="card-text"><b>Observações:</b> {{ registro.observacoes }}</p>
-                    <p class="card-text"><b>Status:</b> {{ registro.status }}</p>
-                    <p class="card-text"><b>TP:</b> {{ registro.TP }}</p>
-                    <p class="card-text"><b>Status de Faturamento:</b> {{ registro.status_faturamento }}</p>
+                  
+                  
                     <p class="card-text"><b>ID Equipamentos:</b> {{ registro.id_equipamentos }}</p>
                     <a href="{% url 'expedicao_expedido' registro.id %}" class="btn btn-primary">Enviar ao Cliente</a>
                     <a class="btn btn-info" href="{% url 'download_pdf_requisicao' registro.id %}">Download PDF</a>

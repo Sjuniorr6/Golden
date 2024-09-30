@@ -4,7 +4,7 @@ from django.contrib import admin
 from . import models 
 
 class saidasadmin(admin.ModelAdmin):
-    list_display = ('nome','data_criacao', 'descricao')
-    search_fields = ('nome',)
+    list_display = ('produto','data_criacao', 'descricao')
+    search_fields = ('produto',)
 
-admin.site.register(models.saidas,saidasadmin)
+admin.site.register(models.Saidas,saidasadmin)

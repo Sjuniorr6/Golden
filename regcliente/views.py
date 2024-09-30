@@ -24,5 +24,5 @@ class RegclienteListViews( PermissionRequiredMixin,LoginRequiredMixin, ListView)
     model = regcliente
     template_name = "regclientes_list.html"
     context_object_name = 'regclientes_list'
-    paginate_by = 10
+   
     permission_required = 'regcliente.view_regcliente'  # Substitua 'regcliente' pelo nome do seu aplicativo

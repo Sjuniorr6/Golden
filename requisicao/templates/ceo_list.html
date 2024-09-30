@@ -8,7 +8,8 @@
 <style>
     .card-status {
         position: relative;
-        transition: transform 0.3s ease; /* Adiciona uma transição suave */
+        transition: transform 0.3s ease;
+        width: 21rem; /* Adiciona uma transição suave */
     }
 
     .card-status.Aprovado {
@@ -72,17 +73,26 @@
                 <h5 class="card-title">{{ item.nome }}</h5>
                 <p class="card-text"><b>ID</b>: {{ item.id }}</p>
                 <p class="card-text"><b>CNPJ</b>: {{ item.cnpj }}</p>
+                <p class="card-text"><b>Valor Total</b>: {{ item.valor_total}}</p>
+                <p class="card-text"><b>Valor Unitarios</b>: {{ item.valor_unitario}}</p>
                 <p class="card-text"><b>Comercial</b>: {{ item.comercial }}</p>
                 <p class="card-text"><b>Tipo de Produto</b>: {{ item.tipo_produto }}</p>
                 <p class="card-text"><b>Observações</b>: {{ item.observacoes }}</p>
                 <p class="card-text"><b>Status</b>: {{ item.status }}</p>
                 <p class="card-text"><b>TP</b>: {{ item.TP }}</p>
                 <!-- Outros detalhes do card -->
+                {% if perms.qualit.view_qualit %}
+                {% if item.id %}
+    <a class="btn btn-primary" href="{% url 'ceodetailview' item.id %}">Visualizar</a>
+    <a class="btn btn-success" href="{% url 'aprovar_ceo' item.id %}">Aprovar</a>
+    <a class="btn btn-danger" href="{% url 'reprovar_ceo' item.id %}">Reprovar</a>
+{% else %}
+    <span class="text-muted">ID não disponível</span>
+{% endif %}
                 
-                <a class="btn btn-primary" href="{% url 'ceodetailview' item.id %}">Visualizar</a>
                 
-                <a class="btn btn-success" href="{% url 'aprovar_ceo' item.id %}">Aprovar</a>
-                <a class="btn btn-danger" href="{% url 'reprovar_ceo' item.id %}">Reprovar</a>
+               
+                {% endif %}
             </div>
         </div>
     </div>

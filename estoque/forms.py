@@ -1,22 +1,23 @@
 from django import forms
-from .models import estoque
-import datetime
+from .models import Estoque
+from django.core.exceptions import ValidationError
 
-# Não é necessário importar Cliente aqui, a menos que seja usado em outro lugar do código.
-
-class estoqueForm(forms.ModelForm):
+class EstoqueForm(forms.ModelForm):
     class Meta:
-        model = estoque
-        fields = ['nome', 'descricao', 'preco', 'marca', 'quantidade']
+        model = Estoque
+        fields = ['produto', 'descricao', 'preco', 'marca', 'quantidade']
         widgets = {
-            'nome': forms.Select(attrs={'class': 'form-control'}),
+            'produto': forms.Select(attrs={'class': 'form-control'}),
             'marca': forms.TextInput(attrs={'class': 'form-control'}),
-            
-            
+            'descricao': forms.TextInput(attrs={'class': 'form-control'}),
             'quantidade': forms.NumberInput(attrs={'class': 'form-control'}),
-            
-        
             'preco': forms.NumberInput(attrs={'class': 'form-control'}),
-            'descricao': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            
         }
+
+    def clean_quantidade(self):
+        quantidade = self.cleaned_data.get('quantidade')
+        nome = self.cleaned_data.get('nome')
+
+        if quantidade < 0:
+            raise ValidationError('A quantidade não pode ser negativa.')
+        return quantidade

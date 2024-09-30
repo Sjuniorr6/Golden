@@ -62,14 +62,23 @@ class FormularioListView( PermissionRequiredMixin,LoginRequiredMixin , ListView)
         return queryset
 
 #------------------------------------------------------------------------------
-class FormulariosCreateView( PermissionRequiredMixin,LoginRequiredMixin , CreateView):
+from django.urls import reverse_lazy
+from django.views.generic.edit import CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from .models import registrodemanutencao
+from .forms import FormulariosForm
+
+class FormulariosCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     model = registrodemanutencao
     form_class = FormulariosForm
     template_name = 'registrodemanutencao_create.html'
     success_url = reverse_lazy('FormulariosCreateView')
-    permission_required = 'registrodemanutencao.add_registrodemanutencao'  # Substitua 'registrodemanutencao' pelo nome do seu aplicativo
+    permission_required = 'registrodemanutencao.add_registrodemanutencao'
 
-#----------------------------------------------------------------------------------
+    def form_valid(self, form):
+        form.instance.quantidade = self.request.POST.get('quantidade', 0)
+        return super().form_valid(form)
+
 
 
 
@@ -203,22 +212,173 @@ class configDetailView(LoginRequiredMixin, DetailView):
       # Substitua 'registrodemanutencao' pelo nome do seu aplicativo
 
 
-from reportlab.lib.pagesizes import letter
-from reportlab.lib.styles import ParagraphStyle
-from reportlab.lib import colors
-from reportlab.pdfgen import canvas
 from django.http import HttpResponse
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.platypus import Paragraph, Spacer, Table
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.lib import colors
 import os
 from django.conf import settings
 
-from reportlab.lib.pagesizes import letter
-from reportlab.lib.styles import ParagraphStyle
-from reportlab.lib import colors
-from reportlab.pdfgen import canvas
-from reportlab.platypus import Paragraph  # Adicione esta linha
+
+
+
 from django.http import HttpResponse
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.platypus import Paragraph, Table
+from reportlab.lib.styles import ParagraphStyle
 import os
 from django.conf import settings
+
+def download_protocolo_entrada(request, pk):
+    try:
+        registro = registrodemanutencao.objects.get(pk=pk)
+    except registrodemanutencao.DoesNotExist:
+        return HttpResponse("Registro não encontrado.", status=404)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="registro-manutencao-{pk}.pdf"'
+
+    p = canvas.Canvas(response, pagesize=letter)
+    p.setTitle(f'Protocolo de entrada - {pk}')
+
+    # Cabeçalho
+    p.setFont("Helvetica-Bold", 16)
+    p.setFillColor(colors.HexColor("#004B87"))
+    y_position = 750
+    p.drawString(200, y_position, "Protocolo de entrada")
+    y_position -= 30
+
+    # Adicionar imagens de cabeçalho
+    imagem_padrao = os.path.join(settings.MEDIA_ROOT, 'imagens_registros/SIDNEISIDNEISIDNEI.png')
+    imagem_qrcode = os.path.join(settings.MEDIA_ROOT, 'imagens_registros/qrcode.png')
+    image_width, image_height = 150, 100
+    page_width, page_height = letter
+    total_width = image_width * 2 + 20
+    x_position = (page_width - total_width) / 2
+
+    # Desenhar as imagens sem o retângulo branco
+    p.drawImage(imagem_padrao, x_position, y_position - image_height, width=image_width, height=image_height, mask='auto')
+    p.drawImage(imagem_qrcode, x_position + image_width + 20, y_position - image_height, width=image_width, height=image_height, mask='auto')
+    y_position -= (image_height + 50)
+
+    p.setFont("Helvetica", 12)
+    p.setFillColor(colors.black)
+
+    def draw_text(p, theme, value, x, y, max_width):
+        theme_style = ParagraphStyle('ThemeStyle', fontName='Helvetica-Bold', fontSize=12)
+        value_style = ParagraphStyle('ValueStyle', fontName='Helvetica', fontSize=12)
+        
+        theme_paragraph = Paragraph(f"<b>{theme}</b>", theme_style)
+        value_paragraph = Paragraph(value, value_style)
+        
+        theme_width, theme_height = theme_paragraph.wrap(max_width, y)
+        value_width, value_height = value_paragraph.wrap(max_width, y)
+        
+        theme_paragraph.drawOn(p, x, y - theme_height)
+        y -= theme_height
+        value_paragraph.drawOn(p, x, y - value_height)
+        y -= value_height + 15  # Espaçamento entre linhas
+        
+        return y
+
+    def check_space(p, y_position, required_space):
+        if y_position - required_space < 50:
+            p.showPage()
+            p.setFont("Helvetica", 12)
+            p.setFillColor(colors.black)
+            return 750
+        return y_position
+
+    def safe_draw_text(p, theme, value, x, y, max_width):
+        if isinstance(value, str):
+            return draw_text(p, theme, value, x, y, max_width)
+        else:
+            return draw_text(p, theme, str(value), x, y, max_width)
+
+    def add_text_with_check(p, theme, value, x, y, max_width):
+        required_space = 50  # Espaço necessário para cada entrada de texto
+        y = check_space(p, y, required_space)
+        return safe_draw_text(p, theme, value, x, y, max_width)
+    
+    def add_text_pair(p, theme1, value1, theme2, value2, x, y, max_width):
+        y = add_text_with_check(p, theme1, value1, x + 250, y, max_width)
+        y = add_text_with_check(p, theme2, value2, x, y + 60, max_width)
+        return y - 35
+
+    x_positions = [100, 350]
+    fields = [
+        ("Nome:", registro.nome),
+        ("Tipo de Entrada:", registro.tipo_entrada),
+        ("Tipo de Produto:", registro.tipo_produto),
+        ("Motivo:", registro.motivo),
+        ("Tipo Customização:", registro.tipo_customizacao),
+        ("Entregue por/Retirado por:", registro.entregue_por_retirado_por),
+        ("Recebimento:", registro.recebimento),
+        ("Faturamento:", registro.faturamento),
+        ("Setor:", registro.setor),
+        ("Customização:", registro.customizacaoo),
+        ("Tratativa:", registro.tratativa),
+        ("Status:", registro.status)
+    ]
+
+    for i in range(0, len(fields), 2):
+        theme1, value1 = fields[i]
+        theme2, value2 = fields[i + 1] if i + 1 < len(fields) else ("", "")
+        y_position = add_text_pair(p, theme1, value1, theme2, value2, x_positions[0], y_position, 200)
+
+    # Adicionar Número Equipamento no centro com tamanho h3
+    p.setFont("Helvetica-Bold", 18)
+    p.drawCentredString(page_width / 2, y_position - 50, "IDS DOS EQUIPAMENTOS")
+    p.setFont("Helvetica", 12)
+    y_position -= 80
+
+    # Dividir os números dos equipamentos em grupos de 8
+    try:
+        equipamentos = sorted(map(int, (num.strip() for num in registro.numero_equipamento.split() if num.strip())))
+    except ValueError:
+        return HttpResponse("Número de equipamento inválido fornecido.", status=400)
+
+    equipment_grid = [equipamentos[i:i+8] for i in range(0, len(equipamentos), 8)]
+
+    # Criando a tabela para os números dos equipamentos
+    equipment_table_data = []
+    for group in equipment_grid:
+        row = [str(num) for num in group]  # Convertendo os números para strings
+        equipment_table_data.append(row)
+
+    # Adicionando a tabela ao PDF
+    equipment_table = Table(equipment_table_data)
+    equipment_table.wrapOn(p, page_width, page_height)
+    equipment_table.drawOn(p, 30, y_position - 10)
+
+    # Feche o objeto PDF e entregue o PDF ao navegador.
+    p.showPage()
+    p.save()
+    return response
+
+
+
+from django.http import HttpResponse
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.platypus import Paragraph
+from reportlab.lib.styles import ParagraphStyle
+import os
+from django.conf import settings
+
+
+
+
+
+
+
+
+
 
 def download_pdf(request, pk):
     try:
@@ -230,27 +390,26 @@ def download_pdf(request, pk):
     response['Content-Disposition'] = f'attachment; filename="registro-manutencao-{pk}.pdf"'
 
     p = canvas.Canvas(response, pagesize=letter)
-    p.setTitle(f'Registro de Manutenção - {pk}')
+    p.setTitle(f'Protocolo de Manutenção - {pk}')
 
     # Cabeçalho
     p.setFont("Helvetica-Bold", 16)
     p.setFillColor(colors.HexColor("#004B87"))
     y_position = 750
-    p.drawString(100, y_position, "Relatório de Manutenção")
-    y_position -= 30
+    p.drawString(200, y_position, "Relatório de Manutenção")
+    y_position -= 10
 
     # Adicionar imagens de cabeçalho
     imagem_padrao = os.path.join(settings.MEDIA_ROOT, 'imagens_registros/SIDNEISIDNEISIDNEI.png')
     imagem_qrcode = os.path.join(settings.MEDIA_ROOT, 'imagens_registros/qrcode.png')
-    image_width, image_height = 200, 100
+    image_width, image_height = 150, 100
     page_width, page_height = letter
     total_width = image_width * 2 + 20
     x_position = (page_width - total_width) / 2
 
-    p.setFillColor(colors.white)
-    p.rect(x_position - 10, y_position - image_height - 10, total_width + 20, image_height + 20, fill=1)
-    p.drawImage(imagem_padrao, x_position, y_position - image_height, width=image_width, height=image_height)
-    p.drawImage(imagem_qrcode, x_position + image_width + 20, y_position - image_height, width=image_width, height=image_height)
+    # Desenhar as imagens sem o retângulo branco
+    p.drawImage(imagem_padrao, x_position, y_position - image_height, width=image_width, height=image_height, mask='auto')
+    p.drawImage(imagem_qrcode, x_position + image_width + 20, y_position - image_height, width=image_width, height=image_height, mask='auto')
     y_position -= (image_height + 20)
 
     p.setFont("Helvetica", 12)
@@ -299,25 +458,24 @@ def download_pdf(request, pk):
         p.drawImage(image_path, x, y - height, width=width, height=height)
         return y - height - 10  # Espaçamento entre imagens
 
-    y_position = add_text_with_check(p, "Nome:", registro.nome, 100, y_position, 400)
-    y_position = add_text_with_check(p, "Tipo de Entrada:", registro.tipo_entrada, 100, y_position, 400)
-    y_position = add_text_with_check(p, "Tipo de Produto:", registro.tipo_produto, 100, y_position, 400)
-    y_position = add_text_with_check(p, "Motivo:", registro.motivo, 100, y_position, 400)
-    y_position = add_text_with_check(p, "Tipo Customização:", registro.tipo_customizacao, 100, y_position, 400)
-    y_position = add_text_with_check(p, "Entregue por/Retirado por:", registro.entregue_por_retirado_por, 100, y_position, 400)
-    y_position = add_text_with_check(p, "Recebimento:", registro.recebimento, 100, y_position, 400)
-    y_position = add_text_with_check(p, "Faturamento:", registro.faturamento, 100, y_position, 400)
-    y_position = add_text_with_check(p, "Setor:", registro.setor, 100, y_position, 400)
-    y_position = add_text_with_check(p, "Customização:", registro.customizacaoo, 100, y_position, 400)
-    y_position = add_text_with_check(p, "Número Equipamento:", registro.numero_equipamento, 100, y_position, 400)
-    y_position = add_text_with_check(p, "Tratativa:", registro.tratativa, 100, y_position, 400)
-    y_position = add_text_with_check(p, "Status:", registro.status, 100, y_position, 400)
+    y_position = add_text_with_check(p, "Nome:", registro.nome, 50, y_position, 400)
+    y_position = add_text_with_check(p, "Tipo de Entrada:", registro.tipo_entrada, 50, y_position, 400)
+    y_position = add_text_with_check(p, "Tipo de Produto:", registro.tipo_produto, 50, y_position, 400)
+    y_position = add_text_with_check(p, "Motivo:", registro.motivo, 50, y_position, 400)
+    y_position = add_text_with_check(p, "Tipo Customização:", registro.tipo_customizacao, 50, y_position, 400)
+    y_position = add_text_with_check(p, "Entregue por/Retirado por:", registro.entregue_por_retirado_por, 50, y_position, 400)
+    y_position = add_text_with_check(p, "Recebimento:", registro.recebimento, 50, y_position, 400)
+    y_position = add_text_with_check(p, "Faturamento:", registro.faturamento, 50, y_position, 400)
+    y_position = add_text_with_check(p, "Setor:", registro.setor, 50, y_position, 400)
+    y_position = add_text_with_check(p, "Customização:", registro.customizacaoo, 50, y_position, 400)
+    y_position = add_text_with_check(p, "Número Equipamento:", registro.numero_equipamento, 50, y_position, 400)
+    y_position = add_text_with_check(p, "Tratativa:", registro.tratativa, 50, y_position, 400)
+    y_position = add_text_with_check(p, "Status:", registro.status, 50, y_position, 400)
 
     # Iterar sobre todas as imagens relacionadas e desenhá-las no PDF
     for imagem in registro.imagens.all():
         if imagem.imagem:  # Verifique se a imagem existe
-            y_position = add_text_with_check(p, "ID:", f"{imagem.id} - Descrição: {imagem.descricao} - Tipo Problema: {imagem.tipo_problema}", 100, y_position, 400)
-
+            y_position = add_text_with_check(p, "ID:", f"{imagem.id} - ID equipamento: {imagem.id_equipamento} - Tipo Problema: {imagem.tipo_problema}", 100, y_position, 400)
             # Adicionar lógica para escrever texto explicativo no campo "tratativa"
             if imagem.tipo_problema == "Oxidação":
                 texto_tratativa = """
@@ -628,7 +786,7 @@ def aprovar_manutencao(request, id):
     # Iterar sobre todas as imagens relacionadas e desenhá-las no PDF
     for imagem in registro.imagens.all():
         if imagem.imagem:  # Verifique se a imagem existe
-            y_position = add_text_with_check(p, "ID:", f"{imagem.id} - Descrição: {imagem.descricao} - Tipo Problema: {imagem.tipo_problema}", 100, y_position, 400)
+            y_position = add_text_with_check(p, "ID:", f"{imagem.id} - ID EQUIPAMENTO: {imagem.id_equipamento} - Tipo Problema: {imagem.tipo_problema}", 100, y_position, 400)
 
             # Adicionar lógica para escrever texto explicativo no campo "tratativa"
             if imagem.tipo_problema == "Oxidação":

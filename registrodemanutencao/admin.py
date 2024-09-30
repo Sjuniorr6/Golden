@@ -4,7 +4,7 @@ from .models import registrodemanutencao  # Importa o modelo registrodemanutenca
 # Classe para personalizar a exibição do modelo registrodemanutencao no admin.
 class RegistroDeManutencaoAdmin(admin.ModelAdmin):
     list_display = ('nome', 'tipo_produto', 'motivo', 'faturamento',
-                    'entregue_por_retirado_por', 'numero_equipamento', 'tratativa', 'imagem',
+                    'entregue_por_retirado_por', 'numero_equipamento', 'tratativa', 'imagem','quantidade',
                      'setor')
     search_fields = ('nome',)  # Permite a busca pelo campo 'nome'.
 

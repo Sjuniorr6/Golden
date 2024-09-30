@@ -8,7 +8,11 @@
 <style>
     .card-status {
         position: relative;
-        transition: transform 0.3s ease; /* Adiciona uma transição suave */
+        transition: transform 0.3s ease;
+        width: 21rem;
+        padding: 0rem;
+        
+         /* Adiciona uma transição suave */
     }
 
     .card-status.Aprovado {
@@ -56,14 +60,42 @@
     }
 
     .card-body {
-        padding: 30px; /* Adiciona um espaço interno de 30px */
+        padding: 10px; /* Adiciona um espaço interno de 30px */
     }
 
     .card-status:hover {
         transform: scale(1.05); /* Faz o card crescer um pouco */
     }
 </style>
+<script>
+   document.querySelectorAll('.add-equipamento').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var containerId = this.getAttribute('data-container-id');
+            var container = document.getElementById(containerId);
+            var newField = document.createElement('textarea');
+            newField.setAttribute('name', 'id_equipamentos');
+            newField.setAttribute('class', 'form-control');
+            container.appendChild(newField);
+        });
+    });
 
+    document.addEventListener('DOMContentLoaded', function() {
+        var cnpjAlert = document.getElementById('cnpj-alert');
+        var cnpjValue = '61.150.751/0025-56'; // Valor do CNPJ a ser verificado
+        var cnpjFields = document.querySelectorAll('.col-form-label');
+
+        cnpjFields.forEach(function(field) {
+            if (field.textContent.includes(cnpjValue)) {
+                var cardBody = field.closest('.card-body');
+                var idLabel = Array.from(cardBody.querySelectorAll('label')).find(label => label.textContent.includes('ID:'));
+                var requisicaoId = idLabel ? idLabel.textContent.split(': ')[1] : 'N/A';
+                cnpjAlert.innerHTML = `<strong>Atenção!</strong> Os ID´s da requisição de ID ( ${requisicaoId} ) com CNPJ ( ${cnpjValue} ) devem ser espelhados para o grid da KRONA_INTEGRACAO`;
+                cnpjAlert.style.display = 'block';
+            }
+        });
+    });
+</script>
+<div id="cnpj-alert" class="alert alert-danger" style="display: none;"></div>
 <div class="container mt-4">
     <h3 class="display-6">Configuração</h3>
     <div class="row">
@@ -89,26 +121,22 @@
                                     <label class="col-sm-6 col-form-label"><b>Endereço:</b> {{ registro.endereco }}</label>
                                 </div>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-6 col-form-label"><b>Data:</b> {{ registro.data }}</label>
+                                    <label class="col-sm-6 col-form-label"><b>CNPJ:</b> {{ registro.cnpj }}</label>
                                 </div>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-6 col-form-label"><b>Contrato:</b> {{ registro.contrato }}</label>
+                                    <label class="col-sm-6 col-form-label"><b>Data:</b> {{ registro.data }}</label>
                                 </div>
+                                
                                 <div class="mb-2 row">
                                     <label class="col-sm-6 col-form-label"><b>Comercial:</b> {{ registro.comercial }}</label>
                                 </div>
                                 <div class="mb-2 row">
                                     <label class="col-sm-6 col-form-label"><b>Tipo de Produto:</b> {{ registro.tipo_produto }}</label>
                                 </div>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-6 col-form-label"><b>Tipo de Fatura:</b> {{ registro.tipo_fatura }}</label>
-                                </div>
-                                <div class="mb-2 row">
+                               <div>
                                     <label class="col-sm-6 col-form-label"><b>Taxa envio:</b> {{ registro.taxa_envio }}</label>
                                 </div>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-6 col-form-label"><b>Status:</b> {{ registro.status }}</label>
-                                </div>
+                              
                                 <div class="mb-2 row">
                                     <label class="col-sm-6 col-form-label"><b>Quantidade:</b> {{ registro.numero_de_equipamentos }}</label>
                                 </div>
@@ -124,7 +152,7 @@
 
                                 {% if registro.status == 'Aprovado pelo CEO' %}
                                     <a href="{% url 'expedir_requisicao' registro.id %}" class="btn btn-primary">Expedir Requisição</a>
-                                    <a href="{% url 'ConfiguracaoUpdateView' registro.id %}" class="btn btn-secondary">Editar Requisição</a>
+                                    <a href="{% url 'ConfiguracaoUpdateView' registro.id %}" class="btn btn-secondary">Incluir ID</a>
                                 {% elif registro.status == 'Aprovado pela Diretoria' %}
                                     <a href="{% url 'expedir_manutencao' registro.id %}" class="btn btn-primary">Expedir Manutenção</a>
                                     <a href="{% url 'ConfiguracaoUpdateView2' registro.id %}" class="btn btn-secondary">Editar Manutenção</a>
@@ -142,18 +170,5 @@
         {% endfor %}
     </div>
 </div>
-
-<script>
-document.querySelectorAll('.add-equipamento').forEach(function(button) {
-    button.addEventListener('click', function() {
-        var containerId = this.getAttribute('data-container-id');
-        var container = document.getElementById(containerId);
-        var newField = document.createElement('textarea');
-        newField.setAttribute('name', 'id_equipamentos');
-        newField.setAttribute('class', 'form-control');
-        container.appendChild(newField);
-    });
-});
-</script>
 
 {% endblock %}

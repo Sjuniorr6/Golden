@@ -34,16 +34,25 @@ class Clientes(models.Model):
     ]
 
     nome = models.CharField(max_length=100)
+    nome_fantasia = models.CharField(max_length=100, null=True)
     endereco = models.CharField(max_length=255)
-    cnpj = models.CharField(max_length=14)
+
+
+    cnpj = models.CharField(max_length=20)
+
+    
+
     tipo_contrato = models.CharField(choices=contratos, max_length=50, null=True,blank=True)
     inicio_de_contrato = models.DateField()
-    vigencia = models.CharField(max_length=14)
+    
     vigencia = models.CharField(choices=vigencia_tipo ,null=True,blank=True, max_length=50)
     status = models.CharField(choices=status ,null=True,blank=True, max_length=50)
     termino = models.CharField(max_length=10,null=True,blank=True)
     equipamento = models.CharField(choices=equipamentos, max_length= 50, null=True, blank=False )
     quantidade = models.IntegerField(null=True, blank=True)
+    gr = models.CharField(null=True, blank=True,max_length=50)
+    corretora = models.CharField(null=True, blank=True,max_length=50)
+    transportadora = models.CharField(null=True, blank=True,max_length=50)
 
     def __str__(self):
         return self.nome

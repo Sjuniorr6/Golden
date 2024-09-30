@@ -8,7 +8,8 @@
 <style>
     .card-status {
         position: relative;
-        transition: transform 0.3s ease; /* Adiciona uma transição suave */
+        transition: transform 0.3s ease;
+        width: 21rem; /* Adiciona uma transição suave */
     }
 
     .card-status.Aprovado {
@@ -75,12 +76,15 @@
                     <p class="card-text"><b>Status:</b> {{ registro.status }}</p>
                     <p class="card-text"><b>Tipo de Entrada:</b> {{ registro.tipo_entrada }}</p>
                     <p class="card-text"><b>Tipo de Produto:</b> {{ registro.tipo_produto }}</p>
-                    <p class="card-text"><b>Customização:</b> {{ registro.customizacao }}</p>
+                    <p class="card-text"><b>Customização:</b> {{ registro.customizacaoo }}</p>
+                    <p class="card-text"><b>Faturamento:</b> {{ registro.faturamento }}</p>
                     <p class="card-text"><b>Motivo:</b> {{ registro.motivo }}</p>
                     <p class="card-text"><b>Setor:</b> {{ registro.setor }}</p>
                     <!-- Botões de ação -->
+                    {% if perms.qualit.view_qualit %}
                     <a class="btn btn-success" href="{% url 'Aprovar_diretoria' registro.id %}">Aprovar</a>
                     <a class="btn btn-danger" href="{% url 'Reprovar_diretoria' registro.id %}">Reprovar</a>
+                    {% endif %}
                 </div>
             </div>
         </div>

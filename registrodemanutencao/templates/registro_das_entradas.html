@@ -10,7 +10,8 @@
 <style>
     .card-status {
         position: relative;
-        transition: transform 0.3s ease; /* Adiciona uma transição suave */
+        transition: transform 0.3s ease; 
+        width: 20rem;/* Adiciona uma transição suave */
     }
 
     .card-status.Aprovado {
@@ -58,7 +59,7 @@
     }
 
     .card-body {
-        padding: 30px; /* Adiciona um espaço interno de 30px */
+        padding: 12px; /* Adiciona um espaço interno de 30px */
     }
 
     .card-status:hover {
@@ -91,6 +92,7 @@
                     <a class="btn btn-danger" href="{% url 'Reprovado_Inteligência' registro.id %}">Diretoria</a>
                     <a class="btn btn-danger" href="{% url 'Reprovado_Inteligência2' registro.id %}">Reprovado</a>
                     <a class="btn btn-info" href="{% url 'download_pdfmanutencao' registro.id %}">Download PDF</a>
+                    <a class="btn btn-info" href="{% url 'download_protocolo_entrada' registro.id %}">Download Protocolo</a>
                     {% endif %}
                     {% if registro.has_retorno_images %}
                     <a class="btn btn-warning" href="{% url 'download_laudo_saida' registro.id %}">Laudo de Saída</a>

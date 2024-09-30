@@ -10,7 +10,7 @@ class produtoviews(PermissionRequiredMixin, LoginRequiredMixin, ListView):
     model = models.Produto
     template_name = "produto_list.html"
     context_object_name = 'produto'
-    paginate_by = 5
+    paginate_by = 20
     permission_required = "produto.view_produto"
     
     def get_queryset(self):
