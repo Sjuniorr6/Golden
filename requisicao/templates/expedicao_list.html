@@ -6,7 +6,7 @@
     .card-status {
         position: relative;
         transition: transform 0.3s ease; 
-        width: 21rem;/* Adiciona uma transição suave */
+        width: 19rem;/* Adiciona uma transição suave */
     }
 
     .card-status.Aprovado {
@@ -54,7 +54,7 @@
     }
 
     .card-body {
-        padding: 30px; /* Adiciona um espaço interno de 30px */
+        padding: 10px; /* Adiciona um espaço interno de 30px */
     }
 
     .card-status:hover {
@@ -65,18 +65,21 @@
     <h3 class="display-6">Expedição</h3>
     <div class="row">
         {% for registro in expedicao_list %}
-        <div class="col-md-4 mb-4">
+        <div class="col-md-3 mb-4">
             <div class="card card-status Configurado">
                 <div class="card-body">
                     {% if registro.endereco %}
                     <h3>Requisição</h3>
-                    <h5 class="card-title">Registro #{{ registro.id }}</h5>
+                    <h5 class="card-title"><h3>Protocolo #{{ registro.id }}</h3></h5>
                     <h5 class="card-title">Nome: {{ registro.nome }}</h5>
                     <p class="card-text"><b>Endereço:</b> {{ registro.endereco }}</p>
                     <p class="card-text"><b>Contrato:</b> {{ registro.contrato }}</p>
                     <p class="card-text"><b>CNPJ:</b> {{ registro.cnpj }}</p>
-                    
-                    <p class="card-text"><b>Data:</b> {{ registro.data }}</p>
+                    {% if registro.aos_cuidados %}
+                    <p class="card-text"><b>Aos Cuidados:</b> {{ registro.aos_cuidados }}</p>
+                    {% endif %}
+                    <p class="card-text"><b>Criada em :</b> {{ registro.data_alteracao }}</p>
+                    <p class="card-text"><b>Alterada em :</b> {{ registro.data }}</p>
                     <p class="card-text"><b>Motivo:</b> {{ registro.motivo }}</p>
                     <p class="card-text"><b>Envio:</b> {{ registro.envio }}</p>
                     <p class="card-text"><b>Comercial:</b> {{ registro.comercial }}</p>
@@ -84,13 +87,19 @@
                     <p class="card-text"><b>Tipo de Produto:</b> {{ registro.tipo_produto }}</p>
                     <p class="card-text"><b>Carregador:</b> {{ registro.carregador }}</p>
                     <p class="card-text"><b>Cabo:</b> {{ registro.cabo }}</p>
+                    <p class="card-text"><b>Quantidade:</b> {{ registro.numero_de_equipamentos }}</p>
+                    
                   
                     
                     <p class="card-text"><b>Observações:</b> {{ registro.observacoes }}</p>
                   
                   
-                    <p class="card-text"><b>ID Equipamentos:</b> {{ registro.id_equipamentos }}</p>
+                   
+                    {% if perms.requisicao.add_requisicoes %}
+                            {% if perms.registrodemanutencao.add_registrodemanutencao %}
                     <a href="{% url 'expedicao_expedido' registro.id %}" class="btn btn-primary">Enviar ao Cliente</a>
+                    {% endif %}
+                    {% endif %}
                     <a class="btn btn-info" href="{% url 'download_pdf_requisicao' registro.id %}">Download PDF</a>
                     {% else %}
                     <h3>Manutenção</h3>

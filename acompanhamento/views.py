@@ -9,7 +9,7 @@ class ClienteListView(PermissionRequiredMixin, LoginRequiredMixin, ListView):
     model = models.Clientes
     template_name = "cliente_list.html"
     context_object_name = 'cliente'
-    paginate_by = 5
+    paginate_by = 20
     permission_required = "acompanhamento.view_clientes"
     
     def get_queryset(self):

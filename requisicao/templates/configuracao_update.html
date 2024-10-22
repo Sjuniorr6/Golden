@@ -23,33 +23,12 @@
         }
     });
 
-    document.addEventListener("input", function(e) {
-        var input = e.target;
-        var value = input.value;
-        var patterns = ["35154", "35642", "86590", "86325"];
-
-        var quantidade = 0;
-
-        patterns.forEach(function(pattern) {
-            var count = (value.match(new RegExp(pattern, "g")) || []).length;
-            if (count > 0) {
-                console.log("Padrão detectado: " + pattern + " - " + count + " vezes"); // Log para depuração
-                value = value.replace(new RegExp(pattern, "g"), "     "); // Substitui o padrão por 5 espaços
-                quantidade += count; // Incrementa a quantidade
-            }
-        });
-
-        // Remove o último número a cada 10 números inteiros e adiciona 5 espaços
-        var regex = /(\d{9})(\d)/g;
-        value = value.replace(regex, function(match, p1, p2) {
-            return p1 + "     "; // Remove o último número e adiciona 5 espaços
-        });
-
-        input.value = value; // Atualiza o valor do campo de entrada
+    
+// Atualiza o valor do campo de entrada
 
         // Atualiza o campo oculto de quantidade
         document.getElementById("quantidade").value = quantidade;
         console.log("Quantidade total de padrões encontrados: " + quantidade); // Log para depuração
-    });
+    
 </script>
 {% endblock %}

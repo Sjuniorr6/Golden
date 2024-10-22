@@ -7,4 +7,4 @@ class Formulario(models.Model):
     vigencia = models.CharField(max_length=14)
     
     def __str__(self):
-        return self.nome
+        return self.razao_social

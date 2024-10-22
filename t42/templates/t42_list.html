@@ -21,7 +21,7 @@
                 <div class="col">
                     <select name="estoque_status" class="form-control">
                         <option value="">Todos os Status de Estoque</option>
-                        <option value="estoque" {% if request.GET.estoque_status == "estoque" %}selected{% endif %}>Estoque</option>
+                        <option value="estoque" {% if request.GET.estoque_status == "estoque" %}selected{% endif %}>estoque</option>
                         <option value="retornando" {% if request.GET.estoque_status == "retornando" %}selected{% endif %}>Retornando</option>
                         <option value="enviado" {% if request.GET.estoque_status == "enviado" %}selected{% endif %}>Enviado</option>
                         <option value="extraviado" {% if request.GET.estoque_status == "extraviado" %}selected{% endif %}>Extraviado</option>
@@ -42,7 +42,6 @@
                     <th>ID</th>
                     <th>Nome</th>
                     <th>Data</th>
-                    
                     <th>Equipamento</th>
                     <th>Status</th>
                     <th>ID Equipamento</th>
@@ -61,14 +60,14 @@
                     <td>{{ registro.id_equipamento }}</td>
                     <td>{{ registro.reversa }}</td>
                     <td>
-                        <form method="post" action="{% url 'update_estoque_status' registro.id %}">
+                        <form id="estoque-form-{{ registro.id }}" method="post" action="{% url 'update_estoque_status' registro.id %}">
                             {% csrf_token %}
-                            <select name="estoque_status" class="form-control" onchange="this.form.submit()">
+                            <select name="estoque_status" class="form-control" onchange="updateEstoqueStatus('{{ registro.id }}')">
                                 <option value="Estoque" {% if registro.estoque_status == "Estoque" %}selected{% endif %}>Estoque</option>
                                 <option value="retornando" {% if registro.estoque_status == "retornando" %}selected{% endif %}>Retornando</option>
                                 <option value="enviado" {% if registro.estoque_status == "enviado" %}selected{% endif %}>Enviado</option>
                                 <option value="extraviado" {% if registro.estoque_status == "extraviado" %}selected{% endif %}>Extraviado</option>
-                                <option value="Manutenção" {% if request.GET.estoque_status == "Manutenção" %}selected{% endif %}>Manutenção</option>
+                                <option value="Manutenção" {% if registro.estoque_status == "Manutenção" %}selected{% endif %}>Manutenção</option>
                             </select>
                         </form>
                     </td>
@@ -83,4 +82,27 @@
     </div>
     {% include 'components/_pagination.html' %}
 </div>
+
+<script>
+    function updateEstoqueStatus(registroId) {
+        var form = document.getElementById('estoque-form-' + registroId);
+        var formData = new FormData(form);
+        
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        }).then(response => {
+            if (response.ok) {
+                console.log('Status atualizado com sucesso');
+            } else {
+                console.error('Erro ao atualizar o status');
+            }
+        }).catch(error => {
+            console.error('Erro ao atualizar o status', error);
+        });
+    }
+</script>
 {% endblock %}

@@ -6,7 +6,7 @@ class RequisicaoForm(forms.ModelForm):
     class Meta:
         model = Requisicoes
         fields = ['nome', 'endereco', 'contrato', 'cnpj', 'inicio_de_contrato', 'vigencia', 
-                  'motivo', 'envio', 'comercial', 'tipo_produto', 
+                  'motivo','antenista', 'envio', 'comercial', 'tipo_produto','aos_cuidados', 
                   'carregador', 'cabo', 'tipo_fatura', 'valor_unitario', 'valor_total',
                   'forma_pagamento','tipo_customizacao', 'numero_de_equipamentos', 'observacoes', 'status', 'TP', 'taxa_envio','status_faturamento',]
         widgets = {
@@ -17,9 +17,11 @@ class RequisicaoForm(forms.ModelForm):
             'cnpj': forms.TextInput(attrs={'class': 'form-control'}),
             'inicio_de_contrato': forms.DateInput(attrs={'class': 'form-control'}),
             'vigencia': forms.Select(attrs={'class': 'form-control'}),
-            
+            'data' :forms.DateField(widget=forms.DateInput(format='%d/%m/%Y')),
             'motivo': forms.Select(attrs={'class': 'form-control'}),
-            'comercial': forms.TextInput(attrs={'class': 'form-control'}),
+            'antenista': forms.Select(attrs={'class': 'form-control'}),
+            'comercial': forms.Select(attrs={'class': 'form-control'}),
+            
             'tipo_produto': forms.Select(attrs={'class': 'form-control'}),
             'envio': forms.Select(attrs={'class': 'form-control'}),
             'taxa_envio': forms.NumberInput(attrs={'class': 'form-control'}),
@@ -30,6 +32,7 @@ class RequisicaoForm(forms.ModelForm):
             'valor_unitario': forms.NumberInput(attrs={'class': 'form-control'}),
             'valor_total': forms.NumberInput(attrs={'class': 'form-control'}),
             'forma_pagamento': forms.TextInput(attrs={'class': 'form-control'}),
+            'aos_cuidados': forms.TextInput(attrs={'class': 'form-control'}),
             'observacoes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'status': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
             'TP': forms.Select(attrs={'class': 'form-control'}),
@@ -151,8 +154,8 @@ class RequisicoesForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['nome'].queryset = Clientes.objects.all()
-        
         self.fields['antenista'].widget = forms.Select(choices=[
+            
             ('ALCIDES', 'ALCIDES'),
             ('EZEQUIEL', 'EZEQUIEL'),
             ('NILDO', 'NILDO'),
@@ -210,8 +213,6 @@ class RequisicoesForm(forms.ModelForm):
                 raise ValidationError(f"O antenista {antenista} ou o produto {tipo_produto} não existem no estoque.")
 
         return cleaned_data
-
-
 
 class EstoqueantenistarForm(forms.ModelForm):
     class Meta:

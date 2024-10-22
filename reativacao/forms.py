@@ -8,7 +8,7 @@ class ReativacaoForm(forms.ModelForm):
         fields = ['nome', 'motivo_reativacao', 'canal_solicitacao', 'observacoes', 'status_reativacao']
         widgets = {
             'nome': forms.Select(attrs={'class': 'form-control'}),
-            'motivo_reativacao': forms.TextInput(attrs={'class': 'form-control'}),
+            'motivo_reativacao': forms.Select(attrs={'class': 'form-control'}),
             'canal_solicitacao': forms.TextInput(attrs={'class': 'form-control'}),
             'observacoes': forms.Textarea(attrs={'class': 'form-control'}),
             'status_reativacao': forms.Select(attrs={'class': 'form-control'}),

@@ -36,8 +36,8 @@ class T42ModelListView(PermissionRequiredMixin, LoginRequiredMixin, ListView):
         context['total_LOKIES'] = T42Model.objects.filter(equipamento='LOKIES').count()
         context['total_estoque'] = T42Model.objects.filter(estoque_status='Estoque').count()
         context['total_retornando'] = T42Model.objects.filter(estoque_status='Retornando').count()
-        context['total_enviado'] = T42Model.objects.filter(estoque_status='Enviado').count()
-        context['total_extraviado'] = T42Model.objects.filter(estoque_status='Extraviado').count()
+        context['total_enviado'] = T42Model.objects.filter(estoque_status='enviado').count()
+        context['total_extraviado'] = T42Model.objects.filter(estoque_status='extraviado').count()
         context['total_manutencao'] = T42Model.objects.filter(estoque_status='Manutenção').count()
         context['total_registrado'] = T42Model.objects.count()  # Total de todos os equipamentos registrados
         return context
@@ -71,16 +71,20 @@ class T42ModelCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView
 
         return response
 
+from django.http import JsonResponse
+
 class UpdateEstoqueStatusView(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
     model = T42Model
     fields = ['estoque_status']
-    template_name = 't42_list.html'
     permission_required = 't42.change_t42model'
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         self.object.estoque_status = request.POST.get('estoque_status')
         self.object.save(update_fields=['estoque_status'])
+
+        if request.is_ajax():
+            return JsonResponse({'success': True})
         return redirect('t42_view')
 
 class RegistrarEstoqueT42View(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
@@ -114,8 +118,8 @@ class RegistrarEstoqueT42View(PermissionRequiredMixin, LoginRequiredMixin, Creat
         context['total_LOKIES'] = T42Model.objects.filter(equipamento='LOKIES').count()
         context['total_estoque'] = T42Model.objects.filter(estoque_status='Estoque').count()
         context['total_retornando'] = T42Model.objects.filter(estoque_status='Retornando').count()
-        context['total_enviado'] = T42Model.objects.filter(estoque_status='Enviado').count()
-        context['total_extraviado'] = T42Model.objects.filter(estoque_status='Extraviado').count()
+        context['total_enviado'] = T42Model.objects.filter(estoque_status='enviado').count()
+        context['total_extraviado'] = T42Model.objects.filter(estoque_status='extraviado').count()
         context['total_manutencao'] = T42Model.objects.filter(estoque_status='Manutenção').count()
         context['total_registrado'] = T42Model.objects.count()  # Total de todos os equipamentos registrados
         context['search'] = self.request.GET.get('search', '')

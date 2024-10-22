@@ -70,10 +70,23 @@
                         {{ form.nome }}
                     </div>
                     <div class="col-md-6 mb-3">
+                        <label for="cnpj" class="form-label">CNPJ</label>
+                        {{ form.cnpj }}
+                    </div>
+                    <div class="col-md-6 mb-3">
                         <label for="endereco" class="form-label">Endereço</label>
                         {{ form.endereco }}
                     </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="taxa_envio" class="form-label">Taxa de Envio</label>
+                        {{ form.taxa_envio }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="taxa_envio" class="form-label">Aos Cuidados</label>
+                        {{ form.aos_cuidados }}
+                    </div>
                 </div>
+                
                 
                 <!-- Detalhes do Contrato -->
                 <div class="section-title">Detalhes do Contrato</div>
@@ -82,10 +95,11 @@
                         <label for="contrato" class="form-label">Contrato</label>
                         {{ form.contrato }}
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="cnpj" class="form-label">CNPJ</label>
-                        {{ form.cnpj }}
-                    </div>
+                    
+                        <div class="col-md-6 mb-3">
+                            <label for="comercial" class="form-label">Comercial</label>
+                            {{ form.comercial }}
+                        </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -105,20 +119,36 @@
                         <label for="motivo" class="form-label">Motivo</label>
                         {{ form.motivo }}
                     </div>
+                    <div class="col-md-6 mb-3" id="antenista-field" style="display: none;">
+                        <label for="antenista" class="form-label">Antenista</label>
+                        {{ form.antenista }}
+                    </div>
                     <div class="col-md-6 mb-3">
                         <label for="envio" class="form-label">Envio</label>
                         {{ form.envio }}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="comercial" class="form-label">Comercial</label>
-                        {{ form.comercial }}
-                    </div>
+                <div class="col-md-6 mb-3">
+                    <label for="tipo_customizacao" class="form-label">Tipo de Customização</label>
+                    {{ form.tipo_customizacao }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="numero_de_equipamentos" class="form-label">Número de Equipamentos</label>
+                    {{ form.numero_de_equipamentos }}
+                </div>
+            </div>
+            <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="tipo_produto" class="form-label">Tipo de Produto</label>
                         {{ form.tipo_produto }}
                     </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="TP" class="form-label">TP</label>
+                        {{ form.TP }}
+                    
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -157,15 +187,7 @@
                 <!-- Outras Informações -->
                 <div class="section-title">Outras Informações</div>
                 <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="tipo_customizacao" class="form-label">Tipo de Customização</label>
-                        {{ form.tipo_customizacao }}
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="numero_de_equipamentos" class="form-label">Número de Equipamentos</label>
-                        {{ form.numero_de_equipamentos }}
-                    </div>
-                </div>
+               
                 <div class="row">
                     <div class="col-md-12 mb-3">
                         <label for="observacoes" class="form-label">Observações</label>
@@ -177,21 +199,10 @@
                         <label for="status" class="form-label">Status</label>
                         {{ form.status }}
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="TP" class="form-label">TP</label>
-                        {{ form.TP }}
-                    </div>
+                    
                 </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="taxa_envio" class="form-label">Taxa de Envio</label>
-                        {{ form.taxa_envio }}
-                    </div>
-                    <div class="col-md-6 mb-3" id="antenista-field" style="display: none;">
-                        <label for="antenista" class="form-label">Antenista</label>
-                        {{ form.antenista }}
-                    </div>
-                </div>
+                
+                 
                 <button type="submit" class="btn btn-primary w-100">Salvar Requisição</button>
             </form>
         </div>
@@ -210,42 +221,40 @@
     <a href="{% url 'requisicoes' %}" class="btn btn-secondary mt-3 w-100">Cancelar e Voltar</a>
 </div>
 
+
 <script>
-    $(document).ready(function() {
-        $('#id_nome').change(function() {
-            var clienteId = $(this).val();
-            if (clienteId) {
-                $.ajax({
-                    url: '{% url "get_cliente_data" 0 %}'.replace('0', clienteId),
-                    type: 'GET',
-                    success: function(data) {
-                        $('#id_cnpj').val(data.cnpj);
-                        $('#id_inicio_de_contrato').val(data.inicio_de_contrato);
-                        $('#id_vigencia').val(data.vigencia);
-                        $('#id_contrato').val(data.contrato);
-                        $('#id_endereco').val(data.endereco);
-                    }
-                });
+         $(document).ready(function() {
+            $('#id_nome').change(function() {
+                var clienteId = $(this).val();
+                if (clienteId) {
+                    $.ajax({
+                        url: '{% url "get_cliente_data" 0 %}'.replace('0', clienteId),
+                        type: 'GET',
+                        success: function(data) {
+                            $('#id_cnpj').val(data.cnpj);
+                            $('#id_inicio_de_contrato').val(data.inicio_de_contrato);
+                            $('#id_vigencia').val(data.vigencia);
+                            $('#id_contrato').val(data.contrato);
+                           
+                        }
+                    });
+                }
+            });
+
+            function toggleAntenistaField() {
+                var motivo = document.getElementById("id_motivo").value;
+                var antenistaField = document.getElementById("antenista-field");
+                if (motivo === "Isca FAST" || motivo === "Estoque Antenista") {
+                    antenistaField.style.display = "block";
+                } else {
+                    antenistaField.style.display = "none";
+                }
             }
+
+            document.getElementById("id_motivo").addEventListener("change", toggleAntenistaField);
+            document.addEventListener("DOMContentLoaded", function() {
+                toggleAntenistaField();
+            });
         });
-
-        function toggleAntenistaField() {
-      var motivo = document.getElementById("id_motivo").value;
-      var antenistaField = document.getElementById("id_antenista").parentElement;
-      if (motivo === "Isca FAST" || motivo === "Estoque Antenista") {
-        antenistaField.style.display = "block";
-      } else {
-        antenistaField.style.display = "none";
-      }
-    }
-
-    // Chama a função ao carregar a página para definir o estado inicial
-    document.addEventListener("DOMContentLoaded", function() {
-      toggleAntenistaField();
-    });
-
-    // Chama a função ao mudar o valor do campo motivo
-    document.getElementById("id_motivo").addEventListener("change", toggleAntenistaField);
-    });
 </script>
 {% endblock %}

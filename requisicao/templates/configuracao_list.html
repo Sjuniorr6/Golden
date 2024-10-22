@@ -9,14 +9,15 @@
     .card-status {
         position: relative;
         transition: transform 0.3s ease;
-        width: 21rem;
-        padding: 0rem;
+        width: 23rem;
+        
+        
         
          /* Adiciona uma transição suave */
     }
 
     .card-status.Aprovado {
-        background: linear-gradient(to bottom, #0ae50a 0%, #ffffff 100%); /* Gradiente verde claro para branco */
+        background: linear-gradient(to bottom, #52f352 0%, #ffffff 100%); /* Gradiente verde claro para branco */
     }
 
     .card-status.Reprovado {
@@ -36,7 +37,7 @@
     }
 
     .card-status.Aprovado-pelo-CEO {
-        background: linear-gradient(to bottom, #30cd30 0%, #ffffff 100%); /* Gradiente verde para branco */
+        background: linear-gradient(to bottom, #69e969 0%, #ffffff 100%); /* Gradiente verde para branco */
     }
 
     .card-status.Reprovado-pela-Diretoria {
@@ -60,11 +61,15 @@
     }
 
     .card-body {
-        padding: 10px; /* Adiciona um espaço interno de 30px */
+        padding: 8px; /* Adiciona um espaço interno de 30px */
     }
 
     .card-status:hover {
         transform: scale(1.05); /* Faz o card crescer um pouco */
+    }
+    .card-body p:hover {
+        transform: translateY(-5px); /* Move o texto para cima */
+        color: #007bff; /* Muda a cor do texto ao passar o mouse */
     }
 </style>
 <script>
@@ -111,44 +116,61 @@
                             {% endif %}
                             <form method="post" class="requisicao-form">
                                 {% csrf_token %}
-                                <div class="mb-2 row">
-                                    <label class="col-sm-6 col-form-label"><b>ID:</b> {{ registro.id }}</label>
+                                <div class="mb-1 row">
+                                    <label class="col-sm-6 col-form-label"><h3><b>ID:</b> {{ registro.id }}</h3></label>
                                 </div>
-                                <div class="mb-2 row">
+                                <div class="mb-1 row">
                                     <label class="col-sm-6 col-form-label"><b>Nome:</b> {{ registro.nome.nome }}</label>
                                 </div>
-                                <div class="mb-2 row">
+                                <div class="mb-1 row">
                                     <label class="col-sm-6 col-form-label"><b>Endereço:</b> {{ registro.endereco }}</label>
                                 </div>
-                                <div class="mb-2 row">
+                                <div class="mb-1 row">
                                     <label class="col-sm-6 col-form-label"><b>CNPJ:</b> {{ registro.cnpj }}</label>
                                 </div>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-6 col-form-label"><b>Data:</b> {{ registro.data }}</label>
+                                <div class="mb-1 row">
+                                    <label class="col-sm-6 col-form-label"><b>Data Alteração:</b> {{ registro.data|date:"d/m/Y H:i:s" }}</label>
                                 </div>
+                                <div class="mb-1 row">
+                                    <label class="col-sm-6 col-form-label"><b>Data de Criação :</b> {{ registro.data_alteracao|date:"d/m/Y H:i:s" }}</label>
+                                </div>
+                               
                                 
-                                <div class="mb-2 row">
+                                <div class="mb-1 row">
                                     <label class="col-sm-6 col-form-label"><b>Comercial:</b> {{ registro.comercial }}</label>
                                 </div>
-                                <div class="mb-2 row">
+                                <div class="mb-1 row">
                                     <label class="col-sm-6 col-form-label"><b>Tipo de Produto:</b> {{ registro.tipo_produto }}</label>
+                                </div>
+                                {% if registro.antenista %}
+                                <div class="mb-1 row">
+                                    <label class="col-sm-6 col-form-label"><b>Antenista : </b> {{ registro.antenista }}</label>
+                                </div>
+                                {% endif %}
+                               
+                                <div class="mb-1 row">
+                                    <label class="col-sm-6 col-form-label"><b>Tipo de Contrato:</b> {{ registro.contrato }}</label>
+                                </div>
+                                <div class="mb-1 row">
+                                    <label class="col-sm-6 col-form-label"><b>Customização:</b> {{ registro.tipo_customizacao }}</label>
                                 </div>
                                <div>
                                     <label class="col-sm-6 col-form-label"><b>Taxa envio:</b> {{ registro.taxa_envio }}</label>
                                 </div>
                               
-                                <div class="mb-2 row">
+                                <div class="mb-1 row">
                                     <label class="col-sm-6 col-form-label"><b>Quantidade:</b> {{ registro.numero_de_equipamentos }}</label>
                                 </div>
-                                <div class="mb-2 row">
+                                <div class="mb-1 row">
                                     <label class="col-sm-6 col-form-label"><b>TP:</b> {{ registro.TP }}</label>
                                 </div>
-                                <div class="mb-2 row">
+                                <div class="mb-1 row">
                                     <label class="col-sm-6 col-form-label"><b>ID Equipamentos:</b> {{ registro.id_equipamentos }}</label>
                                 </div>
-                                <div class="mb-2 row">
+                                <div class="mb-1 row">
                                     <label class="col-sm-6 col-form-label"><b>Observações:</b> {{ registro.observacoes }}</label>
                                 </div>
+                                <a class="btn btn-info" href="{% url 'download_pdf_requisicao' registro.id %}">Download PDF</a>
 
                                 {% if registro.status == 'Aprovado pelo CEO' %}
                                     <a href="{% url 'expedir_requisicao' registro.id %}" class="btn btn-primary">Expedir Requisição</a>
@@ -166,8 +188,8 @@
                         </div>
                     </div>
                 </div>
-            {% endif %}
-        {% endfor %}
+                {% endif %}
+                {% endfor %}    
     </div>
 </div>
 

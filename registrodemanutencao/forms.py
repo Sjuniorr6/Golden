@@ -77,11 +77,12 @@ from django.forms import inlineformset_factory
 ImagemRegistroFormSet = inlineformset_factory(
     registrodemanutencao,
     ImagemRegistro,
-    fields=('imagem',  'id_equipamento' ,'tipo_problema'),
+    fields=('imagem', 'imagem2', 'id_equipamento' ,'tipo_problema'),
     extra=1,
     can_delete=True,
     widgets={
         'imagem': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        'imagem2': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         'id_equipamento': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
       
         
@@ -101,3 +102,8 @@ class RetornoForm(forms.ModelForm):
             'tipo_problema': forms.Select(attrs={'class': 'form-control'}),
             'imagem': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
+
+
+
+
+

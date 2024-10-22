@@ -1,81 +1,44 @@
-{% extends 'base.html' %}  <!-- Herda o layout base do template 'base.html'. -->
+{% extends 'base.html' %}
 {% block title %}
-| Grupo Golden Sat |  <!-- Define o título do bloco que será exibido na aba do navegador. -->
+| Grupo Golden Sat | 
 {% endblock %}
 
-{% include 'components/_header.html' %}  <!-- Inclui o cabeçalho do site a partir de um componente separado. -->
+{% include 'components/_header.html' %}
 {% block content %}
-<!-- Início do conteúdo principal -->
 
-<style>
-    .card-status {
-        position: relative;
-        transition: transform 0.3s ease; 
-        width: 20rem;/* Adiciona uma transição suave */
-    }
-
-    .card-status.Aprovado {
-        background: linear-gradient(to bottom, #a0f0a0 0%, #ffffff 100%); /* Gradiente verde claro para branco */
-    }
-
-    .card-status.Reprovado {
-        background: linear-gradient(to bottom, #f0a0a0 0%, #ffffff 100%); /* Gradiente vermelho claro para branco */
-    }
-
-    .card-status.Pendente {
-        background: linear-gradient(to bottom, #d0d0d0 0%, #ffffff 100%); /* Gradiente cinza claro para branco */
-    }
-
-    .card-status.Configurado {
-        background: linear-gradient(to bottom, #ffd580 0%, #ffffff 100%); /* Gradiente laranja claro para branco */
-    }
-
-    .card-status.Reprovado-pelo-CEO {
-        background: linear-gradient(to bottom, #f08080 0%, #ffffff 100%); /* Gradiente vermelho claro para branco */
-    }
-
-    .card-status.Aprovado-pelo-CEO {
-        background: linear-gradient(to bottom, #80f080 0%, #ffffff 100%); /* Gradiente verde claro para branco */
-    }
-
-    .card-status.Reprovado-pela-Diretoria {
-        background: linear-gradient(to bottom, #f08080 0%, #ffffff 100%); /* Gradiente vermelho claro para branco */
-    }
-
-    .card-status.Aprovado-pela-Diretoria {
-        background: linear-gradient(to bottom, #80f080 0%, #ffffff 100%); /* Gradiente verde claro para branco */
-    }
-
-    .card-status.Expedido {
-        background: linear-gradient(to bottom, #ffb380 0%, #ffffff 100%); /* Gradiente laranja escuro claro para branco */
-    }
-
-    .card-status.Enviado-para-o-Cliente {
-        background: linear-gradient(to bottom, #80b3ff 0%, #ffffff 100%); /* Gradiente azul claro para branco */
-    }
-
-    .card-status.Aprovado-Inteligencia {
-        background: linear-gradient(to bottom, #80f080 0%, #ffffff 100%); /* Gradiente verde claro para branco */
-    }
-
-    .card-body {
-        padding: 12px; /* Adiciona um espaço interno de 30px */
-    }
-
-    .card-status:hover {
-        transform: scale(1.05); /* Faz o card crescer um pouco */
-    }
-</style>
 <div class="container mt-4">
     <a class="btn btn-success" href="{% url 'criar_retorno' %}">Relatorio de Retorno</a>
+
+    <!-- Formulário de Pesquisa -->
+    <form method="GET" class="mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <input type="text" name="id" class="form-control" placeholder="Buscar por ID" value="{{ request.GET.id }}">
+            </div>
+            <div class="col-md-4">
+                <input type="text" name="nome" class="form-control" placeholder="Buscar por Nome" value="{{ request.GET.nome }}">
+            </div>
+            <div class="col-md-4">
+                <select name="status" class="form-control">
+                    <option value="">Selecione o Status</option>
+                    <option value="Pendente" {% if request.GET.status == 'Pendente' %}selected{% endif %}>Pendente</option>
+                    <option value="Manutenção" {% if request.GET.status == 'Manutenção' %}selected{% endif %}>Manutenção</option>
+                    <option value="Reprovado pela Inteligência" {% if request.GET.status == 'Reprovado pela Inteligência' %}selected{% endif %}>Reprovado pela Inteligência</option>
+                    <option value="Aprovado pela Diretoria" {% if request.GET.status == 'Aprovado pela Diretoria' %}selected{% endif %}>Aprovado pela Diretoria</option>
+                    <!-- Adicione outros status conforme necessário -->
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Buscar</button>
+    </form>
+
     <!-- Início da seção de exibição dos registros -->
     <div class="row">
-       
         {% for registro in dasentradas %}
-        <div class="col-md-4 mb-4">
-            <div class="card card-status {% if registro.status == 'Aprovado Inteligência' %}Aprovado_Inteligência{% elif registro.status == 'Reprovado Inteligência' %}Reprovado_Inteligência{% elif registro.status == 'Reprovado' %}Reprovado{% elif registro.status == 'Configurado' %}Configurado{% elif registro.status == 'Pendente' %}Pendente{% elif registro.status == 'Expedido' %}Expedido{% elif registro.status == 'Reprovado pelo CEO' %}Reprovado_pelo_CEO{% elif registro.status == 'Aprovado pelo CEO' %}Aprovado_pelo_CEO{% elif registro.status == 'Reprovado pela Diretoria' %}Reprovado_pela_Diretoria{% elif registro.status == 'Aprovado pela Diretoria' %}Aprovado_pela_Diretoria{% endif %}">
+        <div class="col-md-3 mb-4">
+            <div class="card card-status {% if registro.status == 'Aprovado Inteligência' %}Aprovado_Inteligência{% elif registro.status == 'Reprovado Inteligência' %}Reprovado_Inteligência{% elif registro.status == 'Reprovado' %}Reprovado{% elif registro.status == 'Manutenção' %}Manutenção{% elif registro.status == 'Pendente' %}Pendente{% elif registro.status == 'Expedido' %}Expedido{% elif registro.status == 'Reprovado pelo CEO' %}Reprovado_pelo_CEO{% elif registro.status == 'Aprovado pelo CEO' %}Aprovado_pelo_CEO{% elif registro.status == 'Reprovado pela Diretoria' %}Reprovado_pela_Diretoria{% elif registro.status == 'Aprovado pela Diretoria' %}Aprovado_pela_Diretoria{% endif %}">
                 <div class="card-body">
-                    <h5 class="card-title">Registro #{{ registro.id }}</h5>
+                    <h5 class="card-title"><h3>Registro #{{ registro.id }}</h3></h5>
                     <h5 class="card-title">Nome : {{ registro.nome }}</h5>
                     <p class="card-text"><b>Data:</b> {{ registro.data_criacao }}</p>
                     <p class="card-text"><b>Status:</b> {{ registro.status }}</p>
@@ -89,10 +52,11 @@
                     {% if perms.registrodemanutencao.change_registrodemanutencao %}
                     <a class="btn btn-primary" href="{% url 'FormulariosUpdateView' registro.id %}">Editar</a>
                     <a class="btn btn-success" href="{% url 'Aprovado_Inteligência' registro.id %}">Aprovar</a>
+                    <a class="btn btn-info" href="{% url 'download_pdfmanutencao' registro.id %}">Download PDF</a>
+                    <a class="btn btn-info" href="{% url 'download_protocolo_entrada' registro.id %}">Protocolo</a>
                     <a class="btn btn-danger" href="{% url 'Reprovado_Inteligência' registro.id %}">Diretoria</a>
                     <a class="btn btn-danger" href="{% url 'Reprovado_Inteligência2' registro.id %}">Reprovado</a>
-                    <a class="btn btn-info" href="{% url 'download_pdfmanutencao' registro.id %}">Download PDF</a>
-                    <a class="btn btn-info" href="{% url 'download_protocolo_entrada' registro.id %}">Download Protocolo</a>
+                    <a class="btn btn-info" href="{% url 'editado_manutencao' registro.id %}">Manutenção Concluida</a>
                     {% endif %}
                     {% if registro.has_retorno_images %}
                     <a class="btn btn-warning" href="{% url 'download_laudo_saida' registro.id %}">Laudo de Saída</a>
@@ -106,7 +70,6 @@
         </div>
         {% endfor %}
     </div>
-    <!-- Fim da seção de exibição dos registros -->
 
     <!-- Inclui o componente de paginação. -->
     {% include 'components/_pagination.html' %}

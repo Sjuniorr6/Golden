@@ -39,10 +39,20 @@
         background-color: #344038; /* Substitua pelo valor exato da cor da sua barra de navegação */
         color: white;
     }
+    .texto {
+        text-align: center; /* Centraliza o texto */
+        color: rgb(10, 10, 10); /* Define a cor do texto como branco */
+    }
 </style>
-
+<br>
+<br>
+<br>
 <div class="container mt-5">
-    <h2>Consulta de ID</h2>
+    <div class="texto">
+        <h2>Consulta de ID</h2>
+    </div>
+
+    </div>
     <form method="GET" action="">
         <div class="row mb-3">
             <div class="col">
@@ -55,7 +65,7 @@
                 <input type="text" name="cliente" class="form-control" placeholder="Cliente" value="{{ request.GET.cliente }}">
             </div>
             <div class="col">
-                <button class="btn btn-outline-secondary" type="submit">Filtrar</button>
+                <button class="btn btn btn-primary" type="submit">Filtrar</button>
             </div>
         </div>
     </form>

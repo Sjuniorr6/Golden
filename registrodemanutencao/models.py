@@ -68,6 +68,7 @@ class registrodemanutencao(models.Model):
     RECEBIMENTO_TIPO = [
         ('Correios/Transportadora', 'Correios/Transportadora'),
         ('Entrega na base', 'Entrega na base'),
+        ('Motoboy', 'Motoboy'),
         
     ]
     custom= [
@@ -77,6 +78,7 @@ class registrodemanutencao(models.Model):
         ('Caixa de papelão (bateria desacoplada)' , 'Caixa de papelão (bateria desacoplada)'),
         ('Caixa de papelão + DF' , 'Caixa de papelão + DF'),
         ('Termo branco' , 'Termo branco'),
+        ('Termo branco + Imã' , 'Termo branco + Imã'),
         ('Termo branco + D.F ' , 'Termo branco + D.F'),
         ('Termo branco slim ' , 'Termo branco slim'),
         ('Termo branco slim + D.F +EQT  ' , 'Termo branco slim + D.F +EQT'),
@@ -115,16 +117,26 @@ class registrodemanutencao(models.Model):
 
 
     
-    faturamento = models.CharField(choices=FATURAMENTO, null=True, blank=True, max_length=50)
+    faturamento = models.CharField(choices=FATURAMENTO, null=True, blank=True, max_length=50,default='Pendente')
     setor = models.CharField(choices=SETOR, null=True, blank=True, max_length=50)
     customizacaoo = models.CharField(choices=custom,max_length=250, blank=True, default='')
     numero_equipamento = models.TextField(max_length=2500, blank=True, default='')
     observacoes = models.TextField(max_length=250, blank=True, default='')
     tratativa = models.CharField(choices=TRATATIVAS, null=True, blank=True, max_length=50)
     imagem = models.ImageField(upload_to='imagens/', null=True, blank=True)
+    imagem2 = models.ImageField(upload_to='imagens/', null=True, blank=True)
     status = models.CharField(default='Pendente', max_length=50, null=True, blank=True)
     data_criacao = models.DateTimeField(auto_now_add=True, null=True, blank=True)
    
+
+
+
+
+
+
+
+
+
 
 
 
@@ -150,6 +162,7 @@ class ImagemRegistro(models.Model):
     tipo_problema = models.CharField(choices=TIPO_PROBLEMAS, null=True, blank=True, max_length=50)
     registro = models.ForeignKey(registrodemanutencao, related_name='imagens', on_delete=models.CASCADE)
     imagem = models.ImageField(upload_to='imagens_registros/')
+    imagem2 = models.ImageField(upload_to='imagens_registros/',null=True, blank=True)
     id_equipamento = models.CharField(max_length=255, blank=True)
 
     def __str__(self):

@@ -96,14 +96,18 @@
                 <div class="card-body">
                     <h2>Requisição</h2>
                     <h5 class="card-title">{{ item.nome }}</h5>
-                    <p class="card-text"><b>ID</b>: {{ item.id }}</p>
+                    <p class="card-text"><h3><b>ID</b>: {{ item.id }}</h3></p>
                     <p class="card-text"><b>CNPJ</b>: {{ item.cnpj }}</p>
+                    <p class="card-text"><b>Data</b>: {{ item.data|date:"d/m/Y H:i:s" }}</p>
                     <p class="card-text"><b>Comercial</b>: {{ item.comercial }}</p>
+                    <p class="card-text"><b>Contrato</b>: {{ item.contrato }}</p>
                     <p class="card-text"><b>Tipo de Produto</b>: {{ item.tipo_produto }}</p>
                     <p class="card-text"><b>Observações</b>: {{ item.observacoes }}</p>
+                    <p class="card-text"><b>Customização</b>: {{ item.tipo_customizacao }}</p>
+                    <p class="card-text"><b>ID Equipamentos </b>: {{ item.id_equipamentos }}</p>
                     <p class="card-text"><b>Status</b>: {{ item.status }}</p>
                     <p class="card-text"><b>TP</b>: {{ item.TP }}</p>
-                    <!-- Outros detalhes do card -->
+                    <a class="btn btn-info" href="{% url 'download_pdf_requisicao' item.id %}">Download PDF</a>
                 </div>
             </div>
         </div>

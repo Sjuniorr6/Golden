@@ -24,7 +24,7 @@
     .table-responsive {
         padding: 0 15px;
         margin-left: -40vh;
-        width: 110rem;
+        width: 115rem;
     }
     .form-control {
         width: 100%;
@@ -67,10 +67,10 @@
     }
 
     .table td, .table th {
-        vertical-align: middle; /* Alinhamento vertical centralizado */
+        vertical-align: middle;
+         /* Alinhamento vertical centralizado */
     }
 </style>
-
 <div class="container mt-4">
     <div class="row mb-4">
         <div class="col-md-6">
@@ -109,27 +109,23 @@
             </thead>
             <tbody>
                 {% for manutencao in dasentradas %}
-                    {% if manutencao.status == 'Comercial' %}
-                        <tr class="status-Comercial">
-                            <td>{{ manutencao.id }}</td>
-                            <td>{{ manutencao.nome }}</td>
-                            <td>{{ manutencao.tipo_entrada }}</td>
-                            <td>{{ manutencao.tipo_produto }}</td>
-                            <td>{{ manutencao.motivo }}</td>
-                            <td>{{ manutencao.tipo_customizacao }}</td>
-                            <td>{{ manutencao.id_equipamentos }}</td>
-                            <td>{{ manutencao.entregue_por_retirado_por }}</td>
-                            <td>{{ manutencao.faturamento }}</td>
-                            <td>{{ manutencao.setor }}</td>
-                            <td>{{ manutencao.status }}</td>
-                            <td>{{ manutencao.customizacaoo }}</td>
-                            <td>{{ manutencao.tratativa }}</td>
-
-                            <td>{{ manutencao.observações }}</td>
-
-                            <td><a class="btn btn-info" href="{% url 'download_pdfmanutencao' manutencao.id %}">Download PDF</a></td>
-                        </tr>
-                    {% endif %}
+                    <tr class="status-{{ manutencao.status }}">
+                        <td>{{ manutencao.id }}</td>
+                        <td>{{ manutencao.nome }}</td>
+                        <td>{{ manutencao.tipo_entrada }}</td>
+                        <td>{{ manutencao.tipo_produto }}</td>
+                        <td>{{ manutencao.motivo }}</td>
+                        <td>{{ manutencao.tipo_customizacao }}</td>
+                        <td>{{ manutencao.id_equipamentos }}</td>
+                        <td>{{ manutencao.entregue_por_retirado_por }}</td>
+                        <td>{{ manutencao.faturamento }}</td>
+                        <td>{{ manutencao.setor }}</td>
+                        <td>{{ manutencao.status }}</td>
+                        <td>{{ manutencao.customizacaoo }}</td>
+                        <td>{{ manutencao.tratativa }}</td>
+                        <td>{{ manutencao.observacoes }}</td>
+                        <td><a class="btn btn-info" href="{% url 'download_pdfmanutencao' manutencao.id %}">Download PDF</a></td>
+                    </tr>
                 {% endfor %}
             </tbody>
         </table>

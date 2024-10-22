@@ -20,7 +20,7 @@ class RequisicoesViews(PermissionRequiredMixin, LoginRequiredMixin, ListView):
     model = Requisicoes
     template_name = "requisicoes.html"
     context_object_name = 'requisicoes'
-    paginate_by = 10
+    paginate_by = 12
     permission_required = "requisicao.view_requisicoes"
     
     def get_queryset(self):
@@ -39,26 +39,28 @@ def get_cliente_data(request, cliente_id):
         'inicio_de_contrato': cliente.inicio_de_contrato,
         'vigencia': cliente.vigencia,
         'contrato': cliente.tipo_contrato,
-        'endereco': cliente.endereco,
+       
     }
     return JsonResponse(data) 
-from django.views.generic.edit import CreateView
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.urls import reverse_lazy
+import logging
 from django.contrib import messages
 from django.db import transaction
+from django.urls import reverse_lazy
+from django.views.generic.edit import CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from .models import Requisicoes, estoque_antenista
-from .forms import RequisicoesForm
+from .forms import RequisicaoForm
 
+logger = logging.getLogger(__name__)
 class RequisicaoCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     model = Requisicoes
     template_name = 'requisicao_create.html'
-    form_class = RequisicoesForm
+    form_class = RequisicaoForm
     success_url = reverse_lazy('requisicoes')
     permission_required = "requisicao.add_requisicoes"
 
     def get_queryset(self):
-        return Requisicoes.objects.all().order_by('id')  # Adicionando ordenação ao QuerySet
+        return Requisicoes.objects.all().order_by('id')
 
     def form_valid(self, form):
         motivo = form.cleaned_data.get('motivo')
@@ -66,13 +68,23 @@ class RequisicaoCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateVi
         tipo_produto = form.cleaned_data.get('tipo_produto')
         numero_de_equipamentos = form.cleaned_data.get('numero_de_equipamentos')
 
+        logger.info("Formulário válido: %s", form.is_valid())
+        logger.info("Dados do formulário: %s", form.cleaned_data)
+
         if motivo in ['Isca FAST', 'Estoque Antenista'] and antenista and tipo_produto and numero_de_equipamentos:
             try:
                 with transaction.atomic():
                     requisicao = form.save(commit=False)
                     quantidade_requisitada = int(numero_de_equipamentos)
-                    antenista_estoque, created = estoque_antenista.objects.get_or_create(nome=antenista, tipo_produto=tipo_produto)
+                    antenista_estoque, created = estoque_antenista.objects.get_or_create(
+                        nome=antenista, 
+                        tipo_produto=tipo_produto, 
+                        defaults={'quantidade': 0}
+                    )
                     
+                    if antenista_estoque.quantidade is None:
+                        antenista_estoque.quantidade = 0
+
                     if motivo == 'Isca FAST':
                         if antenista_estoque.quantidade >= quantidade_requisitada:
                             antenista_estoque.quantidade -= quantidade_requisitada
@@ -84,14 +96,15 @@ class RequisicaoCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateVi
                     
                     antenista_estoque.save()
                     requisicao.save()
-            except estoque_antenista.DoesNotExist:
-                messages.error(self.request, f"O antenista {antenista} ou o produto {tipo_produto} não existem no estoque.")
-                return self.form_invalid(form)
+                    return super().form_valid(form)
             except Exception as e:
-                messages.error(self.request, f"Ocorreu um erro ao processar a requisição: {e}")
+                logger.error("Erro ao processar a requisição: %s", e)
+                messages.error(self.request, "Ocorreu um erro ao processar a requisição.")
                 return self.form_invalid(form)
+        else:
+            return super().form_valid(form)
+    
 
-        return super().form_valid(form)
     
 class RequisicaoDetailView(PermissionRequiredMixin,LoginRequiredMixin,DetailView):
     model = models.Requisicoes
@@ -138,6 +151,8 @@ class ConfiguracaoListView(PermissionRequiredMixin,LoginRequiredMixin,ListView):
     
     
     def get_queryset(self):
+        
+        
         requisicoes_queryset = Requisicoes.objects.filter(status__in=['Aprovado pelo CEO']).exclude(tipo_produto__nome__in=['GS310','GS340','GS390','GS8310 (4G)'])
         manutencao_queryset = registrodemanutencao.objects.filter(status__in=['Aprovado Inteligência', 'Aprovado pela Diretoria', 'Aprovado pelo CEO']).exclude(tipo_produto__nome__in=['GS310','GS340','GS390','GS8310 (4G)'])
         # Combine os querysets
@@ -187,14 +202,43 @@ class tecnicoUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateView)
 
 
 #------------------------------------------------------
-class ceoListViews(PermissionRequiredMixin,LoginRequiredMixin,ListView):
+
+
+
+
+
+from django.utils import timezone
+from datetime import timedelta
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.views.generic import ListView
+from .models import Requisicoes
+
+class ceoListViews(PermissionRequiredMixin, LoginRequiredMixin, ListView):
     model = Requisicoes
     template_name = "ceo_list.html"
     context_object_name = 'ceo_list'
     paginate_by = 10
-    permission_required="requisicao.view_requisicoes"
+    permission_required = "requisicao.view_requisicoes"
+
     def get_queryset(self):
-        return Requisicoes.objects.filter(status__in=['Pendente','Aprovado pela Diretoria'])
+        return Requisicoes.objects.filter(status__in=['Pendente', 'Aprovado pela Diretoria'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_pendente'] = Requisicoes.objects.filter(status='Pendente').count()
+        context['total_aprovado_ceo'] = Requisicoes.objects.filter(status='Aprovado pelo CEO').count()
+        context['total_configurado'] = Requisicoes.objects.filter(status='Configurado').count()
+        
+        # Verificando requisições que não foram alteradas nas últimas 24 horas, excluindo 'Enviado para o Cliente'
+        threshold_time = timezone.now() - timedelta(hours=24)
+        context['requisições_sem_alteracao'] = Requisicoes.objects.filter(
+            data_alteracao__lt=threshold_time
+        ).exclude(status='Enviado para o Cliente')  # Exclui o status 'Enviado para o Cliente'
+        
+        # Contando requisições sem alteração
+        context['count_requisicoes_sem_alteracao'] = context['requisições_sem_alteracao'].count()
+        
+        return context
   
 
 class ceodetailview(PermissionRequiredMixin,LoginRequiredMixin,DetailView):
@@ -268,23 +312,23 @@ class expedicaoListViews(PermissionRequiredMixin,LoginRequiredMixin,ListView):
         return combined_queryset
 #------------------------------------------------------
 #------------------------------------------------------
-class historicoListView(PermissionRequiredMixin,LoginRequiredMixin,ListView):
+class historicoListView(PermissionRequiredMixin, LoginRequiredMixin, ListView):
     model = Requisicoes
     template_name = "historico_list.html"
     context_object_name = 'historico_list'
-    paginate_by = 10 
-    permission_required="requisicao.view_requisicoes"
+    paginate_by = 12
+    permission_required = "requisicao.view_requisicoes"
     
     def get_queryset(self):
-        queryset = Requisicoes.objects.filter(status__in=['Enviado para o Cliente', 'Reprovado pelo CEO'])
+        queryset = Requisicoes.objects.all().order_by('-id')
         nome = self.request.GET.get('nome')
-        id_equipamentos = self.request.GET.get('id_equipamentos')
+        status = self.request.GET.get('status')
         
         if nome:
             queryset = queryset.filter(nome__nome__icontains=nome)
         
-        if id_equipamentos:
-            queryset = queryset.filter(id_equipamentos__icontains=id_equipamentos)
+        if status:
+            queryset = queryset.filter(status__icontains=status)
         
         return queryset
 
@@ -450,7 +494,9 @@ from reportlab.platypus import Paragraph
 from reportlab.pdfgen import canvas
 import os
 from django.conf import settings
-
+from django.core.mail import EmailMessage
+from django.shortcuts import get_object_or_404, redirect
+from .models import Requisicoes
 
 def gerar_pdf_requisicao(requisicao):
     pdf_path = os.path.join(settings.MEDIA_ROOT, f'requisicao-{requisicao.id}.pdf')
@@ -461,7 +507,7 @@ def gerar_pdf_requisicao(requisicao):
     p.setFont("Helvetica-Bold", 16)
     p.setFillColor(colors.HexColor("#004B87"))
     y_position = 750
-    p.drawString(200, y_position, "protocolo de saida")
+    p.drawString(200, y_position, "Protocolo de Requisição")
     y_position -= 30
 
     # Adicionar imagens de cabeçalho
@@ -472,7 +518,7 @@ def gerar_pdf_requisicao(requisicao):
     total_width = image_width * 2 + 20
     x_position = (page_width - total_width) / 2
 
-    # Desenhar as imagens sem o retângulo branco
+    # Desenhar as imagens
     p.drawImage(imagem_padrao, x_position, y_position - image_height, width=image_width, height=image_height, mask='auto')
     p.drawImage(imagem_qrcode, x_position + image_width + 20, y_position - image_height, width=image_width, height=image_height, mask='auto')
     y_position -= (image_height + 20)
@@ -493,86 +539,75 @@ def gerar_pdf_requisicao(requisicao):
         theme_paragraph.drawOn(p, x, y - theme_height)
         y -= theme_height
         value_paragraph.drawOn(p, x, y - value_height)
-        y -= value_height + 10  # Espaçamento entre linhas
+        y -= value_height + 1  # Espaçamento entre linhas
         
         return y
 
     def check_space(p, y_position, required_space):
-        if y_position - required_space < 50:
+        if y_position - required_space < 30:
             p.showPage()
             p.setFont("Helvetica", 12)
             p.setFillColor(colors.black)
-            return 750
+            return 650  # Reset y_position for the new page
         return y_position
 
     def safe_draw_text(p, theme, value, x, y, max_width):
-        if isinstance(value, str):
-            return draw_text(p, theme, value, x, y, max_width)
-        else:
-            return draw_text(p, theme, str(value), x, y, max_width)
+        return draw_text(p, theme, str(value), x, y, max_width)
 
     def add_text_with_check(p, theme, value, x, y, max_width):
-        required_space = 50  # Espaço necessário para cada entrada de texto
+        required_space = 20  # Espaço necessário para cada entrada de texto
         y = check_space(p, y, required_space)
         return safe_draw_text(p, theme, value, x, y, max_width)
 
     def add_text_pair(p, theme1, value1, theme2, value2, x, y, max_width):
-        y = add_text_with_check(p, theme1, value1, x + 250, y, max_width)
-        y = add_text_with_check(p, theme2, value2, x, y + 60, max_width)
-        return y - 35
+        y = add_text_with_check(p, theme1, value1, x, y, max_width)
+        y = add_text_with_check(p, theme2, value2, x + max_width, y + 15, max_width)
+        return y - 15
 
-    x_positions = [100, 350]
+    x_positions = [100, 150]
     fields = [
-        ("Nome:", requisicao.nome),
-        ("Registro #:", requisicao.id),
         
-        ("Endereço:", requisicao.endereco),
-        ("Contrato:", requisicao.contrato),
-        ("CNPJ:", requisicao.cnpj),
-        ("Data:", requisicao.data),
-        ("Motivo:", requisicao.motivo),
-        ("Taxa de Envio:", requisicao.taxa_envio),
-        ("Comercial:", requisicao.comercial),
-        ("Tipo de Produto:", requisicao.tipo_produto),
-        ("Carregador:", requisicao.carregador),
-        ("Cabo:", requisicao.cabo),
-        ("Observações:", requisicao.observacoes),
-        ("TP:", requisicao.TP)
+    ("Nome:", requisicao.nome),
+    ("Registro #:", requisicao.id),
+    ("Endereço:", requisicao.endereco),
+    ("Contrato:", requisicao.contrato),
+    ("CNPJ:", requisicao.cnpj),
+    ("Data:", requisicao.data.strftime("%d/%m/%Y") if requisicao.data else "N/A"),
+    ("Motivo:", requisicao.motivo),
+    ("Taxa de Envio:", requisicao.taxa_envio),
+    ("Comercial:", requisicao.comercial),
+    ("Tipo de Produto:", requisicao.tipo_produto),
+    ("Carregador:", requisicao.carregador),
+    ("Cabo:", requisicao.cabo),
+    ("TP:", requisicao.TP),
+    ("Envio:", requisicao.envio),
+    ("Quantidade:", requisicao.numero_de_equipamentos),
+    ("Valor Unitário:", requisicao.valor_unitario),
+    ("Aos Cuidados:", requisicao.aos_cuidados),
+    ("Customização:", requisicao.tipo_customizacao),
+
     ]
 
     for i in range(0, len(fields), 2):
         theme1, value1 = fields[i]
         theme2, value2 = fields[i + 1] if i + 1 < len(fields) else ("   ", "   ")
-        y_position = add_text_pair(p, theme1, value1, theme2, value2, x_positions[0], y_position, 200)
+        y_position = add_text_pair(p, theme1, value1, theme2, value2, x_positions[0], y_position, 300)
 
-    y_position = add_text_with_check(p, "ID Equipamentos:", requisicao.id_equipamentos, 100, y_position, 400)
+    # Adicionar ID Equipamentos com verificação de comprimento
+    equipamentos = str(requisicao.id_equipamentos)
+    if len(equipamentos) > 800:
+        # Se o número de caracteres exceder 1200, comece uma nova página
+        p.showPage()
+        p.setFont("Helvetica", 12)
+        p.setFillColor(colors.black)
+        y_position = 750  # Reset y_position for new page
 
-    # Campo para assinatura do cliente no rodapé
-    y_position = 50
-    p.setFont("Helvetica-Bold", 12)
-    p.drawString(100, y_position + 40, "Assinatura do Cliente:")
-    p.setFont("Helvetica", 12)
-    p.drawString(100, y_position + 20, "Nome:")
-    p.drawString(300, y_position + 20, "CPF/CNPJ:")
-    p.drawString(100, y_position, "Data:")
+    y_position = add_text_with_check(p, "ID Equipamentos:", equipamentos, 100, y_position, 500)
 
-    # Adicionar traçado ao redor do campo de assinatura
-    p.rect(90, y_position - 10, 400, 70, stroke=1, fill=0)
-
-    # Adicionar traçado delimitando os campos
-    p.rect(90, y_position + 10, 200, 20, stroke=1, fill=0)  # Nome
-    p.rect(290, y_position + 10, 200, 20, stroke=1, fill=0)  # CPF/CNPJ
-    p.rect(90, y_position - 10, 400, 20, stroke=1, fill=0)  # Data
-
-    # Feche o objeto PDF e salve no caminho especificado.
+    # Finalize the PDF
     p.showPage()
     p.save()
     return pdf_path
-
-from django.core.mail import EmailMessage
-from django.shortcuts import get_object_or_404, redirect
-from django.conf import settings
-from .models import Requisicoes
 
 def enviar_email_com_pdf(request, id):
     requisicao = get_object_or_404(Requisicoes, id=id)
@@ -593,6 +628,7 @@ def enviar_email_com_pdf(request, id):
         print(f"Erro ao enviar email: {e}")
     
     return redirect('requisicoesListView')
+
 
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse

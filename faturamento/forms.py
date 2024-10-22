@@ -8,7 +8,7 @@ class FormularioForm(forms.ModelForm):
         widgets = {
             'razao_social': forms.TextInput(attrs={'class': 'form-control'}),
             'cnpj': forms.TextInput(attrs={'class': 'form-control'}),
-            'inicio_de_contrato': forms.TextInput(attrs={'class': 'form-control'}),
+            'inicio_de_contrato': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'vigencia': forms.TextInput(attrs={'class': 'form-control'}),
         }
         permissions = [

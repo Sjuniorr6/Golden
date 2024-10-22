@@ -10,6 +10,24 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
 
 ROLESPERMISSIONS_MODULE = 'app.roles'
 
@@ -49,6 +67,9 @@ INSTALLED_APPS = [
     'dashboard',    
     'IAO',   
     't42', 
+    'pparada', 
+    'ticket', 
+    
 
 ]
 
@@ -65,7 +86,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'app.urls'
 
-ALLOWED_HOSTS = ['10.0.0.227', 'localhost', '10.0.0.196']
+ALLOWED_HOSTS = ['52.203.132.152', 'www.intgoldensat.com.br', 'intgoldensat.com.br']
 
 TEMPLATES = [
     {

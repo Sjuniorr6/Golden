@@ -7,7 +7,7 @@ class Clientes(models.Model):
 
     vigencia_tipo = [
 
-        ('' , ''),
+        ('N/A' , 'N/A'),
         ('12' , '12'),
         ('24' , '24' ),
         ('36' , '36'),
@@ -43,7 +43,7 @@ class Clientes(models.Model):
     
 
     tipo_contrato = models.CharField(choices=contratos, max_length=50, null=True,blank=True)
-    inicio_de_contrato = models.DateField()
+    inicio_de_contrato = models.DateField(null=True, blank=True)
     
     vigencia = models.CharField(choices=vigencia_tipo ,null=True,blank=True, max_length=50)
     status = models.CharField(choices=status ,null=True,blank=True, max_length=50)
@@ -52,7 +52,7 @@ class Clientes(models.Model):
     quantidade = models.IntegerField(null=True, blank=True)
     gr = models.CharField(null=True, blank=True,max_length=50)
     corretora = models.CharField(null=True, blank=True,max_length=50)
-    transportadora = models.CharField(null=True, blank=True,max_length=50)
+    seguradora = models.CharField(null=True, blank=True,max_length=50)
 
     def __str__(self):
         return self.nome

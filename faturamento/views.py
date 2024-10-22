@@ -6,6 +6,10 @@ from .models import Formulario
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from itertools import chain
+from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.http import JsonResponse
+
 class FaturamentoListView(PermissionRequiredMixin, LoginRequiredMixin, ListView):
     model = Requisicoes
     template_name = "faturamento_list.html"
@@ -23,30 +27,30 @@ class FaturamentoListView(PermissionRequiredMixin, LoginRequiredMixin, ListView)
         tipo_produto = self.request.GET.get('tipo_produto_filtro')
         contrato_tipo = self.request.GET.get('contrato_tipo_filtro')
         fatura_tipo = self.request.GET.get('fatura_tipo_filtro')
-        
+        status = self.request.GET.get('status')
+
+        # Aplicar filtros
         if data_inicio and data_fim:
             queryset = queryset.filter(data__range=[data_inicio, data_fim])
-        
         if status_faturamento:
             queryset = queryset.filter(status_faturamento=status_faturamento)
-        
         if cliente:
             queryset = queryset.filter(nome=cliente)
-        
         if motivo:
             queryset = queryset.filter(motivo=motivo)
-        
         if tipo_produto:
             queryset = queryset.filter(tipo_produto=tipo_produto)
-        
         if contrato_tipo:
             queryset = queryset.filter(contrato=contrato_tipo)
-        
         if fatura_tipo:
             queryset = queryset.filter(tipo_fatura=fatura_tipo)
         
-        return queryset
 
+        # Desativar paginação se algum filtro for aplicado
+        if data_inicio or data_fim or status_faturamento or cliente or motivo or tipo_produto or contrato_tipo or fatura_tipo:
+            self.paginate_by = None
+
+        return queryset
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['status_faturamento_choices'] = Requisicoes._meta.get_field('status_faturamento').choices
@@ -55,6 +59,7 @@ class FaturamentoListView(PermissionRequiredMixin, LoginRequiredMixin, ListView)
         context['tipo_produto_choices'] = Produto.objects.all()
         context['contrato_tipo_choices'] = Requisicoes._meta.get_field('contrato').choices
         context['fatura_tipo_choices'] = Requisicoes._meta.get_field('tipo_fatura').choices
+        context['status'] = Requisicoes._meta.get_field('status').choices
         return context
 
 def update_status_faturamento(request, id):
@@ -63,7 +68,8 @@ def update_status_faturamento(request, id):
         status_faturamento = request.POST.get('status_faturamento')
         requisicao.status_faturamento = status_faturamento
         requisicao.save()
-    return redirect('faturamento_list')
+        return JsonResponse({'status': 'success', 'message': 'Status atualizado com sucesso'})
+    return JsonResponse({'status': 'error', 'message': 'Método não permitido'}, status=405)
 
 
 class contratosListView(PermissionRequiredMixin, LoginRequiredMixin, ListView):
@@ -100,3 +106,6 @@ def atualizar_observacoes(request, id):
         registro.observacoes = observacoes
         registro.save()
         return redirect('faturamento_list')  # Redireciona para
+    
+
+    

@@ -32,8 +32,12 @@ urlpatterns = [
     path('dashboard/', include('dashboard.urls')),  
     path('adm/', include('adm.urls')),  
     path('iao_list/', include('IAO.urls')),
+    path('pparada/', include('pparada.urls')),
 
+    path('ticket/', include('ticket.urls')),
     path('t42/', include('t42.urls')),
+
+   
 
    
      

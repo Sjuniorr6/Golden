@@ -1,7 +1,7 @@
 from django import forms
 from .models import Prestador  # Certifique-se de importar o modelo correto
 
-class Prestador(forms.ModelForm):
+class Prestadorform(forms.ModelForm):
     class Meta:
         model = Prestador  # Especifique o modelo aqui
         fields = ['nome', 'franquia_km', 'franquiah', 'valor_acionamento', 'valorkm','valor_exedente']

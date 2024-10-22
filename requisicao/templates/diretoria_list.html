@@ -71,7 +71,7 @@
             <div class="card card-status {% if registro.status == 'Aprovado' %}Aprovado{% elif registro.status == 'Reprovado' %}Reprovado{% elif registro.status == 'Configurado' %}Configurado{% elif registro.status == 'Pendente' %}Pendente{% elif registro.status == 'Expedido' %}Expedido{% elif registro.status == 'Reprovado pelo CEO' %}Reprovado-pelo-CEO{% elif registro.status == 'Aprovado pelo CEO' %}Aprovado-pelo-CEO{% elif registro.status == 'Reprovado pela Diretoria' %}Reprovado-pela-Diretoria{% elif registro.status == 'Aprovado pela Diretoria' %}Aprovado-pela-Diretoria{% endif %}">
                 <div class="card-body">
                     <h2>Entrada</h2>
-                    <h5 class="card-title">Registro #{{ registro.id }}</h5>
+                    <h5 class="card-title"><h3>Registro #{{ registro.id }}</h3></h5>
                     <h5 class="card-title">Nome: {{ registro.nome }}</h5>
                     <p class="card-text"><b>Status:</b> {{ registro.status }}</p>
                     <p class="card-text"><b>Tipo de Entrada:</b> {{ registro.tipo_entrada }}</p>

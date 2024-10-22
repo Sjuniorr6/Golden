@@ -6,9 +6,9 @@ class ClienteForm(forms.ModelForm):
     class Meta:
         model = Clientes
 
-        fields = ['nome', 'nome_fantasia','endereco', 'cnpj','tipo_contrato','inicio_de_contrato','vigencia','termino','status','equipamento','quantidade','gr','corretora','transportadora']
+        fields = ['nome', 'nome_fantasia','endereco', 'cnpj','tipo_contrato','inicio_de_contrato','vigencia','termino','status','equipamento','quantidade','gr','corretora','seguradora']
 
-        fields = ['nome', 'endereco', 'cnpj','tipo_contrato','inicio_de_contrato','vigencia','termino','status','equipamento','quantidade']
+       
 
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control'}),
@@ -24,5 +24,5 @@ class ClienteForm(forms.ModelForm):
             'quantidade': forms.Textarea(attrs={'class' : 'form-control', 'rows':1}),
             'gr': forms.Textarea(attrs={'class' : 'form-control', 'rows':1}),
             'corretora': forms.Textarea(attrs={'class' : 'form-control', 'rows':1}),
-            'transportadora': forms.Textarea(attrs={'class' : 'form-control', 'rows':1}),
+            'seguradora': forms.Textarea(attrs={'class' : 'form-control', 'rows':1}),
         }

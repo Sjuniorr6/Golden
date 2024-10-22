@@ -121,26 +121,30 @@
             <thead class="thead-dark">
                 <tr>
                     <th>ID</th>
+                    <th>Data</th>
                     <th>Nome</th>
                     <th>Status</th>
+                    <th>Ultima Alteração</th>
                     <th>Endereço</th>
                     <th>Contrato</th>
                     <th>CNPJ</th>
                     <th>Início do Contrato</th>
                     <th>Vigência</th>
-                    <th>Data</th>
                     <th>Motivo</th>
                     <th>Envio</th>
                     <th>Comercial</th>
                     <th>Tipo de Produto</th>
+                    <th>quantidade</th>
                     <th>Carregador</th>
                     <th>Cabo</th>
                     <th>Tipo de Fatura</th>
                     <th>Valor Unitário</th>
                     <th>Valor Total</th>
                     <th>Formas de Pagamento</th>
+                    <th>Taxa de Envio</th>
                     <th>Observações</th>
-                    <th>TP</th>
+                    <th>Atualização</th>
+                    
                     <th>Status Faturamento</th>
                 
                 </tr>
@@ -149,24 +153,28 @@
                 {% for registro in requisicoes %}
                 <tr class="status-{{ registro.status|lower }}">
                     <td>{{ registro.id }}</td>
+                    <td>{{ registro.data_alteracao }}</td>
                     <td>{{ registro.nome }}</td>
                     <td>{{ registro.status }}</td>
+                    <td>{{ registro.data }}</td>
                     <td>{{ registro.endereco }}</td>
                     <td>{{ registro.contrato }}</td>
                     <td>{{ registro.cnpj }}</td>
-                    <td>{{ registro.inicio_de_contrato|date:"d/m/Y" }}</td>
-                    <td>{{ registro.vigencia|date:"d/m/Y" }}</td>
-                    <td>{{ registro.data|date:"d/m/Y" }}</td>
+                    <td>{{ registro.inicio_de_contrato }}</td>
+                    <td>{{ registro.vigencia }}</td>
                     <td>{{ registro.motivo }}</td>
                     <td>{{ registro.envio }}</td>
                     <td>{{ registro.comercial }}</td>
                     <td>{{ registro.tipo_produto.nome }}</td>
+                    <td>{{ registro.numero_de_equipamentos }}</td>
                     <td>{{ registro.carregador }}</td>
                     <td>{{ registro.cabo }}</td>
                     <td>{{ registro.tipo_fatura }}</td>
                     <td>{{ registro.valor_unitario }}</td>
                     <td>{{ registro.valor_total }}</td>
                     <td>{{ registro.forma_pagamento }}</td>
+                    <td>{{ registro.taxa_envio }}</td>
+                    <td>{{ registro.observacoes }}</td>
                     <td>
                         <form method="post" action="{% url 'atualizar_observacoes' registro.id %}">
                             {% csrf_token %}
@@ -174,17 +182,39 @@
                             <button type="submit" class="btn btn-primary mt-2">Atualizar</button>
                         </form>
                     </td>
-                    <td>{{ registro.TP }}</td>
+                    
                     <td>
-                        <form method="post" action="{% url 'atualizar_status_faturamento' registro.id %}">
+                        <form id="status-form-{{ registro.id }}" method="post" action="{% url 'atualizar_status_faturamento' registro.id %}">
                             {% csrf_token %}
-                            <select name="status_faturamento" class="form-control dropdown-status" onchange="this.form.submit()">
+                            <select name="status_faturamento" class="form-control dropdown-status" onchange="updateStatus('{{ registro.id }}')">
                                 <option value="">Selecione o Status de Faturamento</option>
                                 {% for status in status_faturamento_choices %}
                                     <option value="{{ status.0 }}" {% if registro.status_faturamento == status.0 %}selected{% endif %}>{{ status.1 }}</option>
                                 {% endfor %}
                             </select>
                         </form>
+                        
+                        <script>
+                        function updateStatus(registroId) {
+                            var form = document.getElementById('status-form-' + registroId);
+                            var formData = new FormData(form);
+                        
+                            fetch(form.action, {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log('Status atualizado com sucesso:', data);
+                            })
+                            .catch(error => {
+                                console.error('Erro ao atualizar o status:', error);
+                            });
+                        }
+                        </script>
                     </td>
                 </tr>
                 {% empty %}

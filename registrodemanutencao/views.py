@@ -29,16 +29,30 @@ from django.http import HttpResponse
 from.forms import RetornoForm
 # View para listar todos os registros de manutenção com paginação.4
 #-----------------------------------------------------------------------
-
-class entradasListView( PermissionRequiredMixin,LoginRequiredMixin , ListView):
+class entradasListView(PermissionRequiredMixin, LoginRequiredMixin, ListView):
     model = registrodemanutencao
     template_name = "registro_das_entradas.html"
     context_object_name = 'dasentradas'
-    paginate_by = 6
-    permission_required = 'registrodemanutencao.view_registrodemanutencao'  # Substitua 'registrodemanutencao' pelo nome do seu aplicativo
     
+    permission_required = 'registrodemanutencao.view_registrodemanutencao'
+
     def get_queryset(self):
-        queryset = registrodemanutencao.objects.filter(status__in=['Pendente','Reprovado pela Inteligência','Aprovado pela Diretoria'])
+        queryset = registrodemanutencao.objects.filter(
+            status__in=['Pendente', 'Manutenção', 'Reprovado pela Inteligência', 'Aprovado pela Diretoria']
+        )
+
+        id_param = self.request.GET.get('id')
+        nome_param = self.request.GET.get('nome')
+        status_param = self.request.GET.get('status')
+
+        if id_param:
+            queryset = queryset.filter(id=id_param)  # Filtra pelo ID
+        if nome_param:
+            queryset = queryset.filter(nome__nome__icontains=nome_param)
+        if status_param:
+            queryset = queryset.filter(status=status_param)
+        queryset =queryset.order_by('-id')
+
         return queryset
 #----------------------------------------------------------------------------
 
@@ -212,14 +226,6 @@ class configDetailView(LoginRequiredMixin, DetailView):
       # Substitua 'registrodemanutencao' pelo nome do seu aplicativo
 
 
-from django.http import HttpResponse
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from reportlab.platypus import Paragraph, Spacer, Table
-from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
-from reportlab.lib import colors
-import os
-from django.conf import settings
 
 
 
@@ -311,7 +317,10 @@ def download_protocolo_entrada(request, pk):
 
     x_positions = [100, 350]
     fields = [
+
+        ("Registro #:", registro.id),
         ("Nome:", registro.nome),
+        ("Data:", registro.data_criacao),
         ("Tipo de Entrada:", registro.tipo_entrada),
         ("Tipo de Produto:", registro.tipo_produto),
         ("Motivo:", registro.motivo),
@@ -319,7 +328,7 @@ def download_protocolo_entrada(request, pk):
         ("Entregue por/Retirado por:", registro.entregue_por_retirado_por),
         ("Recebimento:", registro.recebimento),
         ("Faturamento:", registro.faturamento),
-        ("Setor:", registro.setor),
+        
         ("Customização:", registro.customizacaoo),
         ("Tratativa:", registro.tratativa),
         ("Status:", registro.status)
@@ -458,19 +467,22 @@ def download_pdf(request, pk):
         p.drawImage(image_path, x, y - height, width=width, height=height)
         return y - height - 10  # Espaçamento entre imagens
 
+    y_position = add_text_with_check(p, "Registro #:", registro.id, 50, y_position, 400)
+    y_position = add_text_with_check(p, "Data:", registro.data_criacao.strftime("%d/%m/%Y"), 50, y_position, 400)
     y_position = add_text_with_check(p, "Nome:", registro.nome, 50, y_position, 400)
     y_position = add_text_with_check(p, "Tipo de Entrada:", registro.tipo_entrada, 50, y_position, 400)
     y_position = add_text_with_check(p, "Tipo de Produto:", registro.tipo_produto, 50, y_position, 400)
     y_position = add_text_with_check(p, "Motivo:", registro.motivo, 50, y_position, 400)
-    y_position = add_text_with_check(p, "Tipo Customização:", registro.tipo_customizacao, 50, y_position, 400)
+    y_position = add_text_with_check(p, "Customização:", registro.customizacaoo, 50, y_position, 400)
+    
     y_position = add_text_with_check(p, "Entregue por/Retirado por:", registro.entregue_por_retirado_por, 50, y_position, 400)
     y_position = add_text_with_check(p, "Recebimento:", registro.recebimento, 50, y_position, 400)
     y_position = add_text_with_check(p, "Faturamento:", registro.faturamento, 50, y_position, 400)
     y_position = add_text_with_check(p, "Setor:", registro.setor, 50, y_position, 400)
-    y_position = add_text_with_check(p, "Customização:", registro.customizacaoo, 50, y_position, 400)
     y_position = add_text_with_check(p, "Número Equipamento:", registro.numero_equipamento, 50, y_position, 400)
+    y_position = add_text_with_check(p, "observacoes:", registro.observacoes, 50, y_position, 400)
     y_position = add_text_with_check(p, "Tratativa:", registro.tratativa, 50, y_position, 400)
-    y_position = add_text_with_check(p, "Status:", registro.status, 50, y_position, 400)
+  
 
     # Iterar sobre todas as imagens relacionadas e desenhá-las no PDF
     for imagem in registro.imagens.all():
@@ -653,11 +665,11 @@ class historico_manutencaoListView( PermissionRequiredMixin,LoginRequiredMixin ,
     model = registrodemanutencao
     template_name = 'historico_manutencao.html'  # Nome do seu template para status "configuração"
     context_object_name = 'dasentradas'
-    paginate_by = 10 
+    paginate_by = 12 
     permission_required = 'registrodemanutencao.view_registrodemanutencao'  # Substitua 'registrodemanutencao' pelo nome do seu aplicativo
     
     def get_queryset(self):
-        queryset = registrodemanutencao.objects.filter(status__in=['Comercial', 'Reprovado Inteligência','Reprovado pela Diretoria','Aprovado pela Diretoria','Enviado para o Cliente'])
+        queryset = registrodemanutencao.objects.all()
         nome = self.request.GET.get('nome')
         retornoequipamentos = self.request.GET.get('retornoequipamentos')
         
@@ -772,6 +784,7 @@ def aprovar_manutencao(request, id):
     y_position = add_text_with_check(p, "Nome:", registro.nome, 100, y_position, 400)
     y_position = add_text_with_check(p, "Tipo de Entrada:", registro.tipo_entrada, 100, y_position, 400)
     y_position = add_text_with_check(p, "Tipo de Produto:", registro.tipo_produto, 100, y_position, 400)
+    
     y_position = add_text_with_check(p, "Motivo:", registro.motivo, 100, y_position, 400)
     y_position = add_text_with_check(p, "Tipo Customização:", registro.tipo_customizacao, 100, y_position, 400)
     y_position = add_text_with_check(p, "Entregue por/Retirado por:", registro.entregue_por_retirado_por, 100, y_position, 400)
@@ -880,6 +893,11 @@ def reprovar_manutencao(request, id):  # Alterar o nome da função para corresp
     requisicao.status = 'Manutenção'  # Certifique-se de que este é o status correto
     requisicao.save()
     return redirect('entradasListView')
+def editado_manutencao(request, pk):  # O nome da função está correto
+    requisicao = get_object_or_404(registrodemanutencao, id=pk)  # Use 'pk' aqui
+    requisicao.status = 'Manutenção'  # Verifique se este é o status correto
+    requisicao.save()
+    return redirect('entradasListView') 
 
 
 @login_required

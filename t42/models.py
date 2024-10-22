@@ -35,7 +35,7 @@ class T42Model(models.Model):
     data = models.DateField(auto_now=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, blank=True, null=True)
     reversa = models.DateField(blank=True, null=True)
-    estoque_status = models.CharField(max_length=50, choices=STATUS, blank=True, null=True)
+    estoque_status = models.CharField(max_length=50, choices=STATUS, blank=True, null=True, default='Estoque')
     quantidade = models.PositiveIntegerField(default=0)  # Novo campo para rastrear a quantidade
 
     def save(self, *args, **kwargs):

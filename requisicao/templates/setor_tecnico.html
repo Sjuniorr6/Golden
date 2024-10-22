@@ -9,7 +9,7 @@
     .card-status {
         position: relative;
         transition: transform 0.3s ease;
-        width: 21rem; /* Adiciona uma transição suave */
+        width: 23rem; /* Adiciona uma transição suave */
     }
 
     .card-status.Aprovado {
@@ -94,7 +94,7 @@
 </script>
 <div id="cnpj-alert" class="alert alert-danger" style="display: none;"></div>
 <div class="container mt-4">
-    <h3 class="display-6">Area Tecnica</h3>
+    <h3 class="display-6">Area Técnica</h3>
     <div class="row">
         {% for registro in equipamentos %}
             {% if registro.status == 'Aprovado pelo CEO' %}
@@ -109,7 +109,7 @@
                             <form method="post" class="requisicao-form">
                                 {% csrf_token %}
                                 <div class="mb-2 row">
-                                    <label class="col-sm-6 col-form-label"><b>ID:</b> {{ registro.id }}</label>
+                                    <label class="col-sm-6 col-form-label"><h3><b>ID:</b> {{ registro.id }}</h3></label>
                                 </div>
                                 <div class="mb-2 row">
                                     <label class="col-sm-6 col-form-label"><b>Nome:</b> {{ registro.nome.nome }}</label>
@@ -137,9 +137,7 @@
                                 <div class="mb-2 row">
                                     <label class="col-sm-6 col-form-label"><b>Quantidade:</b> {{ registro.numero_de_equipamentos }}</label>
                                 </div>
-                                <div class="mb-2 row">
-                                    <label class="col-sm-6 col-form-label"><b>TP:</b> {{ registro.TP }}</label>
-                                </div>
+                           
                                 <div class="mb-2 row">
                                     <label class="col-sm-6 col-form-label"><b>ID Equipamentos:</b> {{ registro.id_equipamentos }}</label>
                                 </div>
